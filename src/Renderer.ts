@@ -1,7 +1,8 @@
 import {World} from "./world/World";
 
 const imagesToLoad = {
-  'ground': '/ground.png',
+  'dirt': '/ground.png',
+  'tarmac': '/tarmac.png',
   'car': '/car.png',
 }
 
@@ -12,7 +13,7 @@ export type Viewport = {
 
 export class Renderer {
   context: CanvasRenderingContext2D;
-  images: {[key: string]: HTMLImageElement} = {};
+  images: { [key: string]: HTMLImageElement } = {};
   viewport: Viewport = {x: 0, y: 0};
 
   constructor(context: CanvasRenderingContext2D) {
@@ -23,7 +24,7 @@ export class Renderer {
     const images = this.images;
     Object.keys(imagesToLoad).forEach(key => {
       const img = new Image();      // First create the image...
-      img.onload = function(){  // ...then set the onload handler...
+      img.onload = function () {  // ...then set the onload handler...
         images[key] = img;
       };
       img.src = imagesToLoad[key];
@@ -40,22 +41,24 @@ export class Renderer {
 
     this.context.save();
 
-    this.context.translate(this.context.canvas.width/2, this.context.canvas.height/ 2);
+    this.context.translate(this.context.canvas.width / 2, this.context.canvas.height / 2);
     this.context.translate(-this.viewport.x, -this.viewport.y);
 
     // Render ground
-    const groundImage = this.images['ground'];
-    if (groundImage) {
-      const tile_width = 128;
-      const tile_height = 128;
-      for (let x = 0; x < this.context.canvas.width + tile_width; x += tile_width) {
-        for (let y = 0; y < this.context.canvas.height + tile_height; y += tile_height) {
-          this.context.drawImage(groundImage, x, y, tile_width, tile_height);
+    const tile_width = 128;
+    const tile_height = 128;
+    for (let x = 0; x < world.size; x++) {
+      for (let y = 0; y < world.size; y++) {
+
+        const img = this.images[world.ground[x + y * world.size]];
+        if (img) {
+          this.context.drawImage(img, x * tile_width, y * tile_height, tile_width, tile_height);
         }
       }
     }
 
     const carImage = this.images['car'];
+
     if (carImage) {
       world.entities.forEach(e => {
         this.context.save();
@@ -68,6 +71,8 @@ export class Renderer {
       })
     }
 
-    this.context.restore();
+    this
+      .context
+      .restore();
   }
 }

@@ -1,4 +1,5 @@
 import {EntityState} from "./EntityState";
+import {World} from "./World";
 
 export class Entity {
   state: EntityState = new EntityState();
@@ -9,7 +10,7 @@ export class Entity {
     this.state = newState;
   }
 
-  public nextState(): EntityState {
+  public nextState(world: World): EntityState {
     const res: EntityState = {...this.state};
     res.x += res.velocity * Math.cos(res.direction);
     res.y += res.velocity * Math.sin(res.direction);

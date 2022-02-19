@@ -53,7 +53,6 @@ export const Game: React.FC<Props> = (props: Props) => {
 
   const loop = () => {
     car.applyController(controllerRef.current);
-    // console.log('controllerRef.current', controllerRef.current);
 
     world.process();
 

@@ -1,12 +1,18 @@
 import {Entity} from "./Entity";
 import {EntityState} from "./EntityState";
 import {Controller} from "../Controller";
+import {World} from "./World";
 
 export class Car extends Entity{
-  public nextState(): EntityState {
-    const res: EntityState = super.nextState();
+  public nextState(world: World): EntityState {
+    const res: EntityState = super.nextState(world);
 
-    res.velocity *= 0.99;
+    const tX = Math.floor(res.x / 128);
+    const tY = Math.floor(res.y / 128);
+
+    const groundType = world.ground[tX + tY * world.size];
+
+    res.velocity *= groundType === 'tarmac' ? 0.99 : 0.9;
     res.angularVelocity *= 0.9;
 
     if (Math.abs(res.angularVelocity) > 0.015 ) {
