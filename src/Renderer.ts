@@ -1,7 +1,8 @@
 import {World} from "./world/World";
+import {Road} from "./world/roads/Road";
 
 const imagesToLoad = {
-  'dirt': '/ground.png',
+  'dirt': '/ground.jpeg',
   'tarmac': '/tarmac.png',
   'car': '/car.png',
 }
@@ -15,6 +16,7 @@ export class Renderer {
   context: CanvasRenderingContext2D;
   images: { [key: string]: HTMLImageElement } = {};
   viewport: Viewport = {x: 0, y: 0};
+  previousRender: number = 0;
 
   constructor(context: CanvasRenderingContext2D) {
     this.context = context;
@@ -36,8 +38,22 @@ export class Renderer {
   }
 
   public render(world: World) {
+    let fps = null;
+    if (this.previousRender) {
+      const delta = (Date.now() - this.previousRender)/1000;
+      fps = Math.floor(1 / delta);
+    }
+    this.previousRender = Date.now();
+
     this.context.fillStyle = "#201A23";
     this.context.fillRect(0, 0, this.context.canvas.width, this.context.canvas.height); // x, y, width, height
+
+    if (fps) {
+      this.context.fillStyle = "#00F";
+      this.context.strokeStyle = "#FFF";
+      this.context.font = 'bold 20px sans-serif';
+      this.context.strokeText(`${fps}fps`, 5, 40);
+    }
 
     this.context.save();
 
@@ -56,6 +72,25 @@ export class Renderer {
         }
       }
     }
+
+    // Render roads
+    const ctx = this.context;
+    ctx.fillStyle = '#f00';
+
+    for (let r = 0; r < world.roads.length; r++) {
+      const road: Road = world.roads[r];
+
+      for (let t = 0; t < road.tiles.length; t++) {
+        const tile = road.tiles[t];
+        ctx.beginPath();
+        ctx.moveTo(tile.p0.x, tile.p0.y);
+        ctx.lineTo(tile.p1.x, tile.p1.y);
+        ctx.lineTo(tile.p2.x, tile.p2.y);
+        ctx.closePath();
+        ctx.fill();
+      }
+    }
+
 
     const carImage = this.images['car'];
 

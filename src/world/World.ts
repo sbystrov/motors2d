@@ -1,7 +1,11 @@
 import {Entity} from "./Entity";
+import {Road} from "./roads/Road";
+import {RoadBuilder} from "./roads/RoadBuilder";
+import {Vector} from "../utils/Vector";
 
 export class World {
   public entities: Entity[] = [];
+  public roads: Road[] = [];
   public ground: string[] = [];
   public size = 10;
 
@@ -10,12 +14,18 @@ export class World {
   }
 
   public generateGround() {
-    const types = ['tarmac', 'dirt'];
+    const types = ['dirt'];
     for (let y = 0; y < this.size; y++) {
       for (let x = 0; x < this.size; x++) {
-        this.ground[x + y * this.size] = types[Math.floor(Math.random() * 2)];
+        this.ground[x + y * this.size] = types[Math.floor(Math.random() * types.length)];
       }
     }
+
+    // Roads
+    const roadGenerator = new RoadBuilder(new Vector(40, 40));
+    roadGenerator.randomSector(1000);
+
+    this.roads.push(roadGenerator.road);
   }
   process = () => {
     this.entities.forEach(e => {

@@ -2,17 +2,28 @@ import {Entity} from "./Entity";
 import {EntityState} from "./EntityState";
 import {Controller} from "../Controller";
 import {World} from "./World";
+import {Vector} from "../utils/Vector";
 
 export class Car extends Entity{
+  constructor() {
+    super();
+
+    // Toyota supra
+    this.width = 1.72;
+    this.height = 4.661;
+  }
+
   public nextState(world: World): EntityState {
     const res: EntityState = super.nextState(world);
 
-    const tX = Math.floor(res.x / 128);
-    const tY = Math.floor(res.y / 128);
+    let isOnRoad = false;
+    for (let r = 0; r < world.roads.length; r++) {
+      if (world.roads[r].contains(new Vector(res.x, res.y))) {
+        isOnRoad = true;
+      }
+    }
 
-    const groundType = world.ground[tX + tY * world.size];
-
-    res.velocity *= groundType === 'tarmac' ? 0.99 : 0.9;
+    res.velocity *= isOnRoad ? 0.99 : 0.9;
     res.angularVelocity *= 0.9;
 
     if (Math.abs(res.angularVelocity) > 0.015 ) {
