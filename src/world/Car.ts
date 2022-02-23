@@ -53,7 +53,7 @@ export class Car extends RigidObject implements Drawable {
     }
     res.velocity.setDirection(res.velocity.getDirection() + this.frontLeftTire.state.orientation * delta);
     res.orientation = res.velocity.getDirection();
-    res.velocity = res.velocity.multiply(isOnRoad ? 0.99 : 0.99);
+    res.velocity = res.velocity.multiply(isOnRoad ? 0.99 : 0.9);
     // res.angularVelocity *= 0.9;
     //
     // if (Math.abs(res.angularVelocity) > 0.015 ) {
