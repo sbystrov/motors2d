@@ -22,7 +22,7 @@ export class World {
     }
 
     // Roads
-    const roadGenerator = new RoadBuilder(new Vector(40, 40));
+    const roadGenerator = new RoadBuilder(new Vector(0, 0));
     roadGenerator.randomSector(1000);
 
     this.roads.push(roadGenerator.road);
