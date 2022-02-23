@@ -1,5 +1,6 @@
 import {World} from "./world/World";
 import {Road} from "./world/roads/Road";
+import {Vector} from "./utils/Vector";
 
 const imagesToLoad = {
   'dirt': '/ground.jpeg',
@@ -7,15 +8,16 @@ const imagesToLoad = {
   'car': '/car.png',
 }
 
-export type Viewport = {
-  x: number;
-  y: number;
+export type Viewport = Vector;
+
+export interface Drawable {
+  render(context: CanvasRenderingContext2D): void;
 }
 
 export class Renderer {
   context: CanvasRenderingContext2D;
   images: { [key: string]: HTMLImageElement } = {};
-  viewport: Viewport = {x: 0, y: 0};
+  viewport: Viewport = new Vector(0, 0);
   previousRender: number = 0;
 
   constructor(context: CanvasRenderingContext2D) {
@@ -58,6 +60,8 @@ export class Renderer {
     this.context.save();
 
     this.context.translate(this.context.canvas.width / 2, this.context.canvas.height / 2);
+    this.context.scale(20, 20);
+
     this.context.translate(-this.viewport.x, -this.viewport.y);
 
     // Render ground
@@ -75,7 +79,7 @@ export class Renderer {
 
     // Render roads
     const ctx = this.context;
-    ctx.fillStyle = '#f00';
+    ctx.fillStyle = '#888';
 
     for (let r = 0; r < world.roads.length; r++) {
       const road: Road = world.roads[r];
@@ -92,16 +96,21 @@ export class Renderer {
     }
 
 
+    // Render car
     const carImage = this.images['car'];
 
     if (carImage) {
       world.entities.forEach(e => {
         this.context.save();
-        this.context.translate(e.state.x, e.state.y);
-        this.context.rotate(e.state.direction + Math.PI / 2); // in the screenshot I used angle = 20
+        this.context.translate(e.state.position.x, e.state.position.y);
+        this.context.rotate(e.state.orientation + Math.PI / 2); // in the screenshot I used angle = 20
 
-        this.context.drawImage(carImage, -e.width / 2, -e.height / 2, e.width, e.height);
-
+        // // this.context.drawImage(carImage, -e.width / 2, -e.height / 2, e.width, e.height);
+        // this.context.fillStyle = '#f00';
+        // this.context.fillRect(-e.width / 2, -e.height / 2, e.width, e.height);
+        if ('render' in e) {
+          (e as unknown as Drawable).render(this.context);
+        }
         this.context.restore();
       })
     }

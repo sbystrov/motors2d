@@ -56,7 +56,7 @@ export const Game: React.FC<Props> = (props: Props) => {
 
     world.process();
 
-    rendererRef.current.setViewport({x: car.state.x, y: car.state.y});
+    rendererRef.current.setViewport(car.state.position);
     rendererRef.current.render(world);
 
     window.requestAnimationFrame(loop);

@@ -1,10 +1,10 @@
-import {Entity} from "./Entity";
+import {RigidObject} from "./RigidObject";
 import {Road} from "./roads/Road";
 import {RoadBuilder} from "./roads/RoadBuilder";
 import {Vector} from "../utils/Vector";
 
 export class World {
-  public entities: Entity[] = [];
+  public entities: RigidObject[] = [];
   public roads: Road[] = [];
   public ground: string[] = [];
   public size = 10;
@@ -29,7 +29,7 @@ export class World {
   }
   process = () => {
     this.entities.forEach(e => {
-      e.setState(e.nextState(this));
+      e.setState(e.nextState(this, 1 / 60));
     })
   }
 }
