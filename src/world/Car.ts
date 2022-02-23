@@ -11,8 +11,6 @@ export class Car extends RigidObject implements Drawable {
   backLeftTire: RigidObject;
   backRightTire: RigidObject;
 
-  steering: number = 0.0;
-
   constructor() {
     super();
 
@@ -53,7 +51,8 @@ export class Car extends RigidObject implements Drawable {
         isOnRoad = true;
       }
     }
-
+    res.velocity.setDirection(res.velocity.getDirection() + this.frontLeftTire.state.orientation * delta);
+    res.orientation = res.velocity.getDirection();
     res.velocity = res.velocity.multiply(isOnRoad ? 0.99 : 0.99);
     // res.angularVelocity *= 0.9;
     //
@@ -65,8 +64,9 @@ export class Car extends RigidObject implements Drawable {
   }
 
   private steer(angle: number) {
-    let newSteering = this.steering + angle;
-    this.steering = Math.sign(newSteering) * Math.min(Math.abs(newSteering), Math.PI / 4);
+    let newSteering = this.frontLeftTire.state.orientation + angle;
+    this.frontLeftTire.state.orientation = Math.sign(newSteering) * Math.min(Math.abs(newSteering), Math.PI / 4);
+    this.frontRightTire.state.orientation = this.frontLeftTire.state.orientation;
   }
 
   public applyController(controller: Controller) {
@@ -82,8 +82,8 @@ export class Car extends RigidObject implements Drawable {
       this.steer(-0.05);
     } else if (controller.right) {
       this.steer(0.05);
-    } else if (this.steering !== 0) {
-      this.steer(-this.steering / 10);
+    } else if (this.frontLeftTire.state.orientation !== 0) {
+      this.steer(-this.frontLeftTire.state.orientation / 10);
     }
   }
 
@@ -94,7 +94,7 @@ export class Car extends RigidObject implements Drawable {
       -tire.state.position.x,
       -tire.state.position.y
     );
-    context.rotate(this.steering);
+    context.rotate(tire.state.orientation);
     context.fillRect(-tire.width / 2, -tire.height / 2, tire.width, tire.height);
     context.restore();
   }
