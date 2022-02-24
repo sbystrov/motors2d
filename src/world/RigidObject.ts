@@ -13,7 +13,11 @@ export class RigidObject {
   height = 1;
   mass = 1;
 
+  isGliding: boolean = false;
+
   appliedForces: AppliedForce[] = [];
+  force: Vector = new Vector(0, 0);
+  momentum: number = 0;
 
   public setState(newState: PhysicalState) {
     this.state = newState;
@@ -28,13 +32,13 @@ export class RigidObject {
   }
 
   public applyForces(secondsPassed: number) {
-    const force = new Vector(0,0);
-    let momentum = 0;
+    this.force = new Vector(0,0);
+    this.momentum = 0;
 
     for (let i = 0; i<this.appliedForces.length; i++) {
       const appliedForce = this.appliedForces[i];
 
-      force.addTo(appliedForce.force);
+      this.force.addTo(appliedForce.force);
 
       const perpendicular = new Vector(-appliedForce.point.y, appliedForce.point.x);
       perpendicular.normalize();
@@ -43,22 +47,12 @@ export class RigidObject {
 
       // const momentumForce = perpendicular.multiply(perpendicular.dotProduct(appliedForce.force) / appliedForce.force.dotProduct(appliedForce.force));
       momentumForce.rotateBy(-appliedForce.point.getDirection());
-
-      console.log('-------');
-
-      console.log('appliedForce', appliedForce.force);
-      // console.log('perpendicular', perpendicular);
-      // console.log('appliedForce.point.getDirection()', appliedForce.point.getDirection(), appliedForce.point);
-      console.log('momentumForce', momentumForce);
-      // console.log(appliedForce.point.getDirection() - perpendicular.getDirection());
-
-      momentum += Math.sign(momentumForce.y) * momentumForce.getMagnitude() / (this.mass * (appliedForce.point.getMagnitude() ^ 2));
+      this.momentum += Math.sign(momentumForce.y) * momentumForce.getMagnitude() / (this.mass * (appliedForce.point.getMagnitude() ^ 2));
     }
 
-
     // Now change speed and angular velocity
-    this.state.velocity.addTo(force.multiply(secondsPassed / this.mass));
-    this.state.angularVelocity += momentum * secondsPassed;
+    this.state.velocity.addTo(this.force.rotate(this.state.orientation).multiply(secondsPassed / this.mass));
+    this.state.angularVelocity += this.momentum * secondsPassed;
   }
 
   public nextState(world: World, secondsPassed: number): PhysicalState {

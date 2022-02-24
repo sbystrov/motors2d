@@ -231,8 +231,22 @@ export class Vector {
   rotateBy(angle: number) {
     const cos = Math.cos(angle);
     const sin = Math.sin(angle);
-    this.x = cos * this.x - sin * this.y;
-    this.y = sin * this.x + cos * this.y;
+    const {x, y} = this;
+    this.x = cos * x - sin * y;
+    this.y = sin * x + cos * y;
+  }
+
+
+  /**
+   * Rotates vector by angle
+   *
+   * @param {number} direction The rotation angle (in radians) to assign to the vector
+   * @memberof Vector
+   */
+  rotate(angle: number) {
+    const res = this.copy();
+    res.rotateBy(angle);
+    return res;
   }
 
   /**

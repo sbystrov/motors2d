@@ -47,41 +47,68 @@ export class Car extends RigidObject implements Drawable {
 
   private addTireForce(tire: RigidObject, secondsPassed: number) {
     const steeringVector = new Vector(1, 0);
-    const orientation = tire.state.orientation + this.state.orientation;
-    const relativeSpeed = this.state.velocity.getMagnitude() * Math.sin(orientation);
-    steeringVector.setDirection(tire.state.orientation + Math.PI * Math.sign(tire.state.orientation));
-    steeringVector.multiplyBy(relativeSpeed * this.mass / (secondsPassed ^ 2));
-    console.log('steeringVector speed', steeringVector);
+    const relativeSpeed = this.state.velocity.copy();
+    relativeSpeed.rotateBy(-this.state.orientation);
+    const rotationSpeed = tire.state.position.rotate(Math.PI / 2).multiply(this.state.angularVelocity);
+    relativeSpeed.addTo(rotationSpeed);
+    relativeSpeed.multiplyBy(-1);
+
+    steeringVector.setDirection(tire.state.orientation + Math.PI * (Math.sign(tire.state.orientation) || 1) / 2);
+
+    const projection = relativeSpeed.dotProduct(steeringVector);
+    steeringVector.multiplyBy(projection);
+
+    steeringVector.multiplyBy(this.mass * tire.state.position.getMagnitude() ^ 2 / secondsPassed);
+
+    const kTren = tire.isGliding ? 0.5 : 0.9;
+    const maxForce = kTren * this.mass * 1000 / 4 * tire.height ^ 2;
+    if (maxForce < steeringVector.getMagnitude()) {
+      console.log('maxForce', maxForce, steeringVector.getMagnitude());
+      steeringVector.setMagnitude(maxForce);
+      tire.isGliding = true;
+    } else {
+      tire.isGliding = false;
+    }
 
     this.addForce({
-      point: this.frontLeftTire.state.position,
+      point: tire.state.position,
       force: steeringVector
     });
+
+    // this.addForce({
+    //   point: this.frontLeftTire.state.position,
+    //   force: relativeSpeed
+    // });
   }
 
   public enumerateForces(secondsPassed: number) {
     super.enumerateForces(secondsPassed);
 
     if (this.throttle) {
-      // const force = new Vector(1, 0);
+      const force = new Vector(1, 0);
       // force.setDirection(this.state.orientation);
-      // force.setMagnitude(this.throttle * 7354.9 * (secondsPassed ^ 2));
-      //
-      // // Apply throttle
-      // this.addForce({
-      //   point: this.backLeftTire.state.position,
-      //   force: force
-      // });
-      // this.addForce({
-      //   point: this.backRightTire.state.position,
-      //   force: force
-      // });
+      force.setMagnitude(this.throttle * 7354.9 * (secondsPassed ^ 2));
+
+      // Apply throttle
+      this.addForce({
+        point: this.backLeftTire.state.position,
+        force: force
+      });
+      this.addForce({
+        point: this.backRightTire.state.position,
+        force: force
+      });
     }
 
-    this.state.velocity = new Vector(10, 0);
+    // this.state.velocity = new Vector(10, 0);
+    // this.state.orientation = -Math.PI / 3;
+    // this.state.angularVelocity = 3;
 
     // Apply steering
     this.addTireForce(this.frontLeftTire, secondsPassed);
+    this.addTireForce(this.frontRightTire, secondsPassed);
+    this.addTireForce(this.backLeftTire, secondsPassed);
+    this.addTireForce(this.backRightTire, secondsPassed);
   }
 
   public nextState(world: World, delta: number): PhysicalState {
@@ -93,9 +120,6 @@ export class Car extends RigidObject implements Drawable {
         isOnRoad = true;
       }
     }
-    // res.velocity.setDirection(res.velocity.getDirection() + this.frontLeftTire.state.orientation * delta);
-    // res.orientation = res.velocity.getDirection();
-    // res.velocity = res.velocity.multiply(isOnRoad ? 0.99 : 0.9);
 
     return res;
   }
@@ -115,12 +139,10 @@ export class Car extends RigidObject implements Drawable {
       this.throttle = 0;
     }
 
-    // this.state.angularVelocity *= 0.9;
-
     if (controller.left) {
-      this.steer(-0.05);
+      this.steer(-0.02);
     } else if (controller.right) {
-      this.steer(0.05);
+      this.steer(0.02);
     } else if (this.frontLeftTire.state.orientation !== 0) {
       this.steer(-this.frontLeftTire.state.orientation / 10);
     }
@@ -139,6 +161,9 @@ export class Car extends RigidObject implements Drawable {
   }
 
   render(context: CanvasRenderingContext2D) {
+    context.translate(this.state.position.x, this.state.position.y);
+    context.rotate(this.state.orientation); // in the screenshot I used angle = 20
+
     context.fillStyle = '#f00';
     context.fillRect(-this.width / 2, -this.height / 2, this.width, this.height);
 
@@ -153,5 +178,18 @@ export class Car extends RigidObject implements Drawable {
     this.drawTire(context, this.backLeftTire);
     this.drawTire(context, this.backRightTire);
     context.restore();
+
+    // // Draw forces
+    // this.appliedForces.forEach(f => {
+    //   const force = new Vector(f.force.x, f.force.y);
+    //   force.multiplyBy(1/this.mass);
+    //
+    //   context.strokeStyle = '#000';
+    //   context.lineWidth = 0.1;
+    //   context.beginPath();
+    //   context.moveTo(f.point.x, f.point.y);
+    //   context.lineTo(f.point.x + force.x, f.point.y + force.y);
+    //   context.stroke();
+    // })
   };
 }

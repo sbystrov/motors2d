@@ -102,8 +102,6 @@ export class Renderer {
     if (carImage) {
       world.entities.forEach(e => {
         this.context.save();
-        this.context.translate(e.state.position.x, e.state.position.y);
-        this.context.rotate(e.state.orientation); // in the screenshot I used angle = 20
 
         // // this.context.drawImage(carImage, -e.width / 2, -e.height / 2, e.width, e.height);
         // this.context.fillStyle = '#f00';
