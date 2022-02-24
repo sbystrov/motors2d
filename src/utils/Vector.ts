@@ -223,6 +223,19 @@ export class Vector {
   }
 
   /**
+   * Rotates vector by angle
+   *
+   * @param {number} direction The rotation angle (in radians) to assign to the vector
+   * @memberof Vector
+   */
+  rotateBy(angle: number) {
+    const cos = Math.cos(angle);
+    const sin = Math.sin(angle);
+    this.x = cos * this.x - sin * this.y;
+    this.y = sin * this.x + cos * this.y;
+  }
+
+  /**
    * Copies the current vector to a new Vector object
    *
    * @returns {Vector} An deep copy of the current vector
@@ -269,4 +282,6 @@ export class Vector {
   toObject(): any {
     return { x: this.x, y: this.y, angle: this.getDirection(), length: this.getMagnitude() };
   }
+
+
 }

@@ -27,9 +27,11 @@ export class World {
 
     this.roads.push(roadGenerator.road);
   }
-  process = () => {
+  process = (secondsPassed: number) => {
     this.entities.forEach(e => {
-      e.setState(e.nextState(this, 1 / 60));
+      e.setState(e.nextState(this, secondsPassed));
+      e.enumerateForces(secondsPassed);
+      e.applyForces(secondsPassed);
     })
   }
 }

@@ -54,7 +54,7 @@ export const Game: React.FC<Props> = (props: Props) => {
   const loop = () => {
     car.applyController(controllerRef.current);
 
-    world.process();
+    world.process(1/60);
 
     rendererRef.current.setViewport(car.state.position);
     rendererRef.current.render(world);

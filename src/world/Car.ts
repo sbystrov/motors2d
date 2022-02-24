@@ -11,35 +11,77 @@ export class Car extends RigidObject implements Drawable {
   backLeftTire: RigidObject;
   backRightTire: RigidObject;
 
+  throttle: number = 0.0;
+
   constructor() {
     super();
 
     // Toyota supra
-    this.width = 1.72;
-    this.height = 4.661;
+    this.width = 4.661;
+    this.height = 1.72;
+    this.mass = 1361;
 
-    const TIRE_WIDTH = 0.2;
-    const TIRE_HEIGHT = 0.8;
+    const TIRE_WIDTH = 0.8;
+    const TIRE_HEIGHT = 0.2;
 
     this.frontLeftTire = new RigidObject();
     this.frontLeftTire.width = TIRE_WIDTH;
     this.frontLeftTire.height = TIRE_HEIGHT;
-    this.frontLeftTire.state.position = new Vector(-this.width / 2 + TIRE_WIDTH / 2,this.height / 2 - TIRE_HEIGHT);
+    this.frontLeftTire.state.position = new Vector(this.width / 2 - TIRE_WIDTH, - this.height / 2 + TIRE_HEIGHT / 2);
 
     this.frontRightTire = new RigidObject();
     this.frontRightTire.width = TIRE_WIDTH;
     this.frontRightTire.height = TIRE_HEIGHT;
-    this.frontRightTire.state.position = new Vector(this.width / 2 - TIRE_WIDTH / 2,this.height / 2 - TIRE_HEIGHT);
+    this.frontRightTire.state.position = new Vector(this.width / 2 - TIRE_WIDTH, this.height / 2 - TIRE_HEIGHT / 2);
 
     this.backLeftTire = new RigidObject();
     this.backLeftTire.width = TIRE_WIDTH;
     this.backLeftTire.height = TIRE_HEIGHT;
-    this.backLeftTire.state.position = new Vector(-this.width / 2 + TIRE_WIDTH / 2,-this.height / 2 + TIRE_HEIGHT);
+    this.backLeftTire.state.position = new Vector(-this.width / 2 + TIRE_WIDTH, -this.height / 2 + TIRE_HEIGHT / 2);
 
     this.backRightTire = new RigidObject();
     this.backRightTire.width = TIRE_WIDTH;
     this.backRightTire.height = TIRE_HEIGHT;
-    this.backRightTire.state.position = new Vector(this.width / 2 - TIRE_WIDTH / 2, -this.height / 2 + TIRE_HEIGHT);
+    this.backRightTire.state.position = new Vector(- this.width / 2 + TIRE_WIDTH, this.height / 2 - TIRE_HEIGHT / 2);
+  }
+
+  private addTireForce(tire: RigidObject, secondsPassed: number) {
+    const steeringVector = new Vector(1, 0);
+    const orientation = tire.state.orientation + this.state.orientation;
+    const relativeSpeed = this.state.velocity.getMagnitude() * Math.sin(orientation);
+    steeringVector.setDirection(tire.state.orientation + Math.PI * Math.sign(tire.state.orientation));
+    steeringVector.multiplyBy(relativeSpeed * this.mass / (secondsPassed ^ 2));
+    console.log('steeringVector speed', steeringVector);
+
+    this.addForce({
+      point: this.frontLeftTire.state.position,
+      force: steeringVector
+    });
+  }
+
+  public enumerateForces(secondsPassed: number) {
+    super.enumerateForces(secondsPassed);
+
+    if (this.throttle) {
+      // const force = new Vector(1, 0);
+      // force.setDirection(this.state.orientation);
+      // force.setMagnitude(this.throttle * 7354.9 * (secondsPassed ^ 2));
+      //
+      // // Apply throttle
+      // this.addForce({
+      //   point: this.backLeftTire.state.position,
+      //   force: force
+      // });
+      // this.addForce({
+      //   point: this.backRightTire.state.position,
+      //   force: force
+      // });
+    }
+
+    this.state.velocity = new Vector(10, 0);
+
+    // Apply steering
+    this.addTireForce(this.frontLeftTire, secondsPassed);
   }
 
   public nextState(world: World, delta: number): PhysicalState {
@@ -51,14 +93,9 @@ export class Car extends RigidObject implements Drawable {
         isOnRoad = true;
       }
     }
-    res.velocity.setDirection(res.velocity.getDirection() + this.frontLeftTire.state.orientation * delta);
-    res.orientation = res.velocity.getDirection();
-    res.velocity = res.velocity.multiply(isOnRoad ? 0.99 : 0.9);
-    // res.angularVelocity *= 0.9;
-    //
-    // if (Math.abs(res.angularVelocity) > 0.015 ) {
-    //   res.angularVelocity = Math.sign(res.angularVelocity) * 0.015;
-    // }
+    // res.velocity.setDirection(res.velocity.getDirection() + this.frontLeftTire.state.orientation * delta);
+    // res.orientation = res.velocity.getDirection();
+    // res.velocity = res.velocity.multiply(isOnRoad ? 0.99 : 0.9);
 
     return res;
   }
@@ -71,12 +108,14 @@ export class Car extends RigidObject implements Drawable {
 
   public applyController(controller: Controller) {
     if (controller.up) {
-      this.state.velocity.setMagnitude(this.state.velocity.getMagnitude() + 0.5);
+      this.throttle = 1;
+    } else if (controller.down) {
+      this.throttle = -1;
+    } else {
+      this.throttle = 0;
     }
-    if (controller.down) {
-      this.state.velocity.setMagnitude(this.state.velocity.getMagnitude() - 0.5);
-    }
-    this.state.angularVelocity *= 0.9;
+
+    // this.state.angularVelocity *= 0.9;
 
     if (controller.left) {
       this.steer(-0.05);
@@ -91,8 +130,8 @@ export class Car extends RigidObject implements Drawable {
   drawTire(context: CanvasRenderingContext2D, tire: RigidObject) {
     context.save();
     context.translate(
-      -tire.state.position.x,
-      -tire.state.position.y
+      tire.state.position.x,
+      tire.state.position.y
     );
     context.rotate(tire.state.orientation);
     context.fillRect(-tire.width / 2, -tire.height / 2, tire.width, tire.height);
