@@ -1,4 +1,4 @@
-import {RigidObject} from "./RigidObject";
+import {RigidObject} from "../physics2d/RigidObject";
 import {Road} from "./roads/Road";
 import {RoadBuilder} from "./roads/RoadBuilder";
 import {Vector} from "../utils/Vector";
@@ -26,12 +26,5 @@ export class World {
     roadGenerator.randomSector(1000);
 
     this.roads.push(roadGenerator.road);
-  }
-  process = (secondsPassed: number) => {
-    this.entities.forEach(e => {
-      e.setState(e.nextState(this, secondsPassed));
-      e.enumerateForces(secondsPassed);
-      e.applyForces(secondsPassed);
-    })
   }
 }

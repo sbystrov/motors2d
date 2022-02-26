@@ -1,6 +1,8 @@
 import {World} from "./world/World";
 import {Road} from "./world/roads/Road";
 import {Vector} from "./utils/Vector";
+import {Physics2d} from "./physics2d/Physics2d";
+import {RigidObject} from "./physics2d/RigidObject";
 
 const imagesToLoad = {
   'dirt': '/ground.jpeg',
@@ -39,7 +41,7 @@ export class Renderer {
     this.viewport = viewport;
   }
 
-  public render(world: World) {
+  public render(world: World, physics: Physics2d) {
     let fps = null;
     if (this.previousRender) {
       const delta = (Date.now() - this.previousRender)/1000;
@@ -60,7 +62,7 @@ export class Renderer {
     this.context.save();
 
     this.context.translate(this.context.canvas.width / 2, this.context.canvas.height / 2);
-    this.context.scale(20, 20);
+    this.context.scale(5, 5);
 
     this.context.translate(-this.viewport.x, -this.viewport.y);
 
@@ -112,6 +114,28 @@ export class Renderer {
         this.context.restore();
       })
     }
+
+    // Рисуем физику
+    const context = this.context;
+    for (let r = 0; r < physics.dynamicObjects.length; r++) {
+      const object: RigidObject = physics.dynamicObjects[r];
+
+      context.save();
+      context.translate(object.state.position.x, object.state.position.y);
+      context.rotate(object.state.orientation); // in the screenshot I used angle = 20
+
+      context.fillStyle = '#f00';
+      if (physics.collisions.find(c => c.obj1 === object || c.obj2 === object)) {
+        // Подкрасим столкнувшиеся элементы
+        context.fillStyle = '#0ff';
+      }
+
+      context.strokeStyle = '#0ff';
+      object.shape.draw(context);
+
+      context.restore();
+    }
+
 
     this
       .context

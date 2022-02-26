@@ -6,15 +6,63 @@ import {World} from "./world/World";
 import {Car} from "./world/Car";
 import {Renderer} from "./Renderer";
 import {Controller} from "./Controller";
+import {Physics2d} from "./physics2d/Physics2d";
+import {RigidObject} from "./physics2d/RigidObject";
+import {RectShape} from "./physics2d/shape/RectShape";
+import {Vector} from "./utils/Vector";
 
 type Props = {
   className?: string;
 }
 
 const world = new World();
-const car = new Car();
+// const car = new Car();
+const physics2d = new Physics2d();
 
-world.entities.push(car);
+// world.entities.push(car);
+physics2d.addDynamicObject(new RigidObject(
+  new RectShape(),
+  1000,
+  new Vector(25, 5),
+  new Vector(0, 5),
+  0
+));
+physics2d.addDynamicObject(new RigidObject(
+  new RectShape(),
+  10,
+  new Vector(25, 30),
+  new Vector(0, -5),
+  0
+));
+physics2d.addDynamicObject(new RigidObject(
+  new RectShape(),
+  10,
+  new Vector(15, 0),
+  new Vector(5, 5),
+  0
+));
+
+physics2d.addDynamicObject(new RigidObject(
+  new RectShape(),
+  10,
+  new Vector(25, 15),
+  new Vector(5, 5),
+  0
+));
+physics2d.addDynamicObject(new RigidObject(
+  new RectShape(),
+  10,
+  new Vector(35, 7.5),
+  new Vector(-5, 5),
+  0
+));
+physics2d.addDynamicObject(new RigidObject(
+  new RectShape(),
+  10,
+  new Vector(30, 30),
+  new Vector(5, -5),
+  0
+));
 
 export const Game: React.FC<Props> = (props: Props) => {
   const {
@@ -25,7 +73,7 @@ export const Game: React.FC<Props> = (props: Props) => {
   const boardRef = useRef<HTMLDivElement>();
   const rendererRef = useRef<Renderer>();
   const controllerRef = useRef<Controller>();
-
+  const lastTimestampRef = useRef<number>();
 
   useEffect(() => {
     if (context.current) {
@@ -51,13 +99,17 @@ export const Game: React.FC<Props> = (props: Props) => {
     }
   }
 
-  const loop = () => {
-    car.applyController(controllerRef.current);
+  const loop = (timestamp: number) => {
+    // car.applyController(controllerRef.current);
 
-    world.process(1/60);
+    // world.process(1/60);
+    if (lastTimestampRef.current) {
+      physics2d.update((timestamp - lastTimestampRef.current) / 1000);
+    }
+    lastTimestampRef.current = timestamp;
 
-    rendererRef.current.setViewport(car.state.position);
-    rendererRef.current.render(world);
+    // rendererRef.current.setViewport(car.state.position);
+    rendererRef.current.render(world, physics2d);
 
     window.requestAnimationFrame(loop);
   }

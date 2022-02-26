@@ -1,6 +1,8 @@
 import {PhysicalState} from "./PhysicalState";
-import {World} from "./World";
+import {World} from "../world/World";
 import {Vector} from "../utils/Vector";
+import {Physics2d} from "./Physics2d";
+import {Shape} from "./shape/Shape";
 
 type AppliedForce = {
   point: Vector;
@@ -9,6 +11,8 @@ type AppliedForce = {
 
 export class RigidObject {
   state: PhysicalState = new PhysicalState();
+  shape: Shape;
+
   width = 1;
   height = 1;
   mass = 1;
@@ -18,6 +22,14 @@ export class RigidObject {
   appliedForces: AppliedForce[] = [];
   force: Vector = new Vector(0, 0);
   momentum: number = 0;
+
+  constructor(shape: Shape, mass: number, position: Vector, velocity: Vector, momentum: number) {
+    this.shape = shape;
+    this.mass = mass;
+    this.state.position = position;
+    this.state.velocity = velocity;
+    this.momentum = momentum;
+  }
 
   public setState(newState: PhysicalState) {
     this.state = newState;
@@ -55,7 +67,7 @@ export class RigidObject {
     this.state.angularVelocity += this.momentum * secondsPassed;
   }
 
-  public nextState(world: World, secondsPassed: number): PhysicalState {
+  public nextState(physics2d: Physics2d, secondsPassed: number): PhysicalState {
     const res: PhysicalState = {
       velocity: this.state.velocity.copy(),
       position: this.state.position.copy(),
