@@ -16,10 +16,12 @@ type Props = {
 }
 
 const world = new World();
-// const car = new Car();
+const car = new Car();
 const physics2d = new Physics2d();
 
 // world.entities.push(car);
+physics2d.addDynamicObject(car);
+
 physics2d.addDynamicObject(new RigidObject(
   new RectShape(),
   1000,

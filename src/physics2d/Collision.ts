@@ -18,7 +18,7 @@ const rectIntersect = (x1, y1, w1, h1, x2, y2, w2, h2) => {
 
 export const detectCollision = (obj1: RigidObject, obj2: RigidObject): Vector => {
   const shape1 = obj1.shape as RectShape;
-  const shape2 = obj1.shape as RectShape;
+  const shape2 = obj2.shape as RectShape;
 
   if (rectIntersect(
     obj1.state.position.x - shape1.width / 2,
