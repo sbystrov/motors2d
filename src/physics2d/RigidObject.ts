@@ -1,5 +1,3 @@
-import {PhysicalState} from "./PhysicalState";
-import {World} from "../world/World";
 import {Vector} from "../utils/Vector";
 import {Physics2d} from "./Physics2d";
 import {Shape} from "./shape/Shape";
@@ -10,29 +8,25 @@ type AppliedForce = {
 }
 
 export class RigidObject {
-  state: PhysicalState = new PhysicalState();
+  position: Vector = new Vector(0,0);
+  orientation: number = 0;
+  velocity: Vector = new Vector(0,0);
+  angularVelocity: number = 0;
   shape: Shape;
 
-  width = 1;
-  height = 1;
   mass = 1;
-
-  isGliding: boolean = false;
 
   appliedForces: AppliedForce[] = [];
   force: Vector = new Vector(0, 0);
   momentum: number = 0;
 
-  constructor(shape: Shape, mass: number, position: Vector, velocity: Vector, momentum: number) {
+  constructor(shape: Shape, mass: number, position: Vector, velocity: Vector, orientation: number, momentum: number) {
     this.shape = shape;
     this.mass = mass;
-    this.state.position = position;
-    this.state.velocity = velocity;
+    this.position = position;
+    this.velocity = velocity;
+    this.orientation = orientation;
     this.momentum = momentum;
-  }
-
-  public setState(newState: PhysicalState) {
-    this.state = newState;
   }
 
   public addForce(appliedForce: AppliedForce) {
@@ -63,20 +57,16 @@ export class RigidObject {
     }
 
     // Now change speed and angular velocity
-    this.state.velocity.addTo(this.force.rotate(this.state.orientation).multiply(secondsPassed / this.mass));
-    this.state.angularVelocity += this.momentum * secondsPassed;
+    this.velocity.addTo(this.force.rotate(this.orientation).multiply(secondsPassed / this.mass));
+    this.angularVelocity += this.momentum * secondsPassed;
   }
 
-  public nextState(physics2d: Physics2d, secondsPassed: number): PhysicalState {
-    const res: PhysicalState = {
-      velocity: this.state.velocity.copy(),
-      position: this.state.position.copy(),
-      orientation: this.state.orientation,
-      angularVelocity: this.state.angularVelocity
-    };
-    res.position = res.position.add(res.velocity.multiply(secondsPassed));
-    res.orientation = res.orientation + res.angularVelocity * secondsPassed;
+  public update(physics2d: Physics2d, secondsPassed: number) {
+    this.position = this.position.add(this.velocity.multiply(secondsPassed));
+    this.orientation = this.orientation + this.angularVelocity * secondsPassed;
+  }
 
-    return res;
+  public draw(context:CanvasRenderingContext2D) {
+    this.shape.draw(context);
   }
 }

@@ -1,4 +1,5 @@
-import {Shape} from "./Shape";
+import {Line, Polygon, Shape} from "./Shape";
+import {Vector} from "../../utils/Vector";
 
 export class RectShape extends Shape {
   width: number = 5;
@@ -14,4 +15,39 @@ export class RectShape extends Shape {
   public draw(context:CanvasRenderingContext2D) {
     context.fillRect(-this.width / 2, -this.height / 2, this.width, this.height);
   }
+
+  public getPoly(position: Vector, orientation: number): Polygon {
+    const res = new Polygon();
+
+    const points: Vector[] = [];
+    points[0] = new Vector(-this.width / 2, this.height / 2);
+    points[1] = new Vector(this.width / 2, this.height / 2);
+    points[2] = new Vector(this.width / 2, -this.height / 2);
+    points[3] = new Vector(-this.width / 2, -this.height / 2);
+
+    // Rotate
+    const sin = Math.sin(orientation);
+    const cos = Math.cos(orientation);
+
+    points.forEach(p => {
+      const x = p.x * cos - p.y * sin;
+      const y = p.x * sin + p.y * cos;
+
+      p.x = x;
+      p.y = y;
+    });
+
+    // Translate
+    points.forEach(p => {
+      p.x = p.x + position.x;
+      p.y = p.y + position.y;
+    });
+
+    res.lines.push(new Line(points[0], points[1]));
+    res.lines.push(new Line(points[1], points[2]));
+    res.lines.push(new Line(points[2], points[3]));
+    res.lines.push(new Line(points[3], points[0]));
+
+    return res;
+  };
 }

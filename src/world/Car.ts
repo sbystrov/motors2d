@@ -1,80 +1,67 @@
 import {RigidObject} from "../physics2d/RigidObject";
-import {PhysicalState} from "../physics2d/PhysicalState";
 import {Controller} from "../Controller";
-import {World} from "./World";
 import {Vector} from "../utils/Vector";
-import {Drawable} from "../Renderer";
 import {Physics2d} from "../physics2d/Physics2d";
 import {RectShape} from "../physics2d/shape/RectShape";
 
-export class Car extends RigidObject implements Drawable {
-  frontLeftTire: RigidObject;
-  frontRightTire: RigidObject;
-  backLeftTire: RigidObject;
-  backRightTire: RigidObject;
+const TIRE_WIDTH = 0.8;
+const TIRE_HEIGHT = 0.2;
+
+export class Car extends RigidObject {
+  frontLeftTire: Vector;
+  frontRightTire: Vector;
+  backLeftTire: Vector;
+  backRightTire: Vector;
 
   throttle: number = 0.0;
+  steering: number = 0.0;
 
   constructor() {
     super(
       new RectShape(4.661, 1.72),
       1361,
       new Vector(0,0),
-      new Vector(2, 1),
+      new Vector(0,0),
+      0,
       0
     );
 
     // Toyota supra
-    const TIRE_WIDTH = 0.8;
-    const TIRE_HEIGHT = 0.2;
-    //
-    // this.frontLeftTire = new RigidObject();
-    // this.frontLeftTire.width = TIRE_WIDTH;
-    // this.frontLeftTire.height = TIRE_HEIGHT;
-    // this.frontLeftTire.state.position = new Vector(this.width / 2 - TIRE_WIDTH, - this.height / 2 + TIRE_HEIGHT / 2);
-    //
-    // this.frontRightTire = new RigidObject();
-    // this.frontRightTire.width = TIRE_WIDTH;
-    // this.frontRightTire.height = TIRE_HEIGHT;
-    // this.frontRightTire.state.position = new Vector(this.width / 2 - TIRE_WIDTH, this.height / 2 - TIRE_HEIGHT / 2);
-    //
-    // this.backLeftTire = new RigidObject();
-    // this.backLeftTire.width = TIRE_WIDTH;
-    // this.backLeftTire.height = TIRE_HEIGHT;
-    // this.backLeftTire.state.position = new Vector(-this.width / 2 + TIRE_WIDTH, -this.height / 2 + TIRE_HEIGHT / 2);
-    //
-    // this.backRightTire = new RigidObject();
-    // this.backRightTire.width = TIRE_WIDTH;
-    // this.backRightTire.height = TIRE_HEIGHT;
-    // this.backRightTire.state.position = new Vector(- this.width / 2 + TIRE_WIDTH, this.height / 2 - TIRE_HEIGHT / 2);
+    const shape = this.shape as RectShape;
+
+    this.frontLeftTire = new Vector(shape.width / 2 - TIRE_WIDTH, - shape.height / 2 + TIRE_HEIGHT / 2);
+    this.frontRightTire = new Vector(shape.width / 2 - TIRE_WIDTH, shape.height / 2 - TIRE_HEIGHT / 2);
+    this.backLeftTire = new Vector(-shape.width / 2 + TIRE_WIDTH, -shape.height / 2 + TIRE_HEIGHT / 2);
+    this.backRightTire = new Vector(- shape.width / 2 + TIRE_WIDTH, shape.height / 2 - TIRE_HEIGHT / 2);
   }
 
-  private addTireForce(tire: RigidObject, secondsPassed: number) {
+  private addTireForce(tire: Vector, secondsPassed: number) {
     const steeringVector = new Vector(1, 0);
-    const relativeSpeed = this.state.velocity.copy();
-    relativeSpeed.rotateBy(-this.state.orientation);
-    const rotationSpeed = tire.state.position.rotate(Math.PI / 2).multiply(this.state.angularVelocity);
+    const relativeSpeed = this.velocity.copy();
+    relativeSpeed.rotateBy(-this.orientation);
+    const rotationSpeed = tire.rotate(Math.PI / 2).multiply(this.angularVelocity);
     relativeSpeed.addTo(rotationSpeed);
     relativeSpeed.multiplyBy(-1);
 
-    steeringVector.setDirection(tire.state.orientation + Math.PI * (Math.sign(tire.state.orientation) || 1) / 2);
+    // steeringVector.setDirection(tire.state.orientation + Math.PI * (Math.sign(tire.state.orientation) || 1) / 2);
+    steeringVector.setDirection(this.steering + Math.PI * (Math.sign(this.steering) || 1) / 2);
 
     const projection = relativeSpeed.dotProduct(steeringVector);
     steeringVector.multiplyBy(projection);
 
-    steeringVector.multiplyBy(this.mass * tire.state.position.getMagnitude() ^ 2 / secondsPassed);
+    steeringVector.multiplyBy(this.mass * tire.getMagnitude() ^ 2 / secondsPassed);
 
-    const kTren = tire.isGliding ? 0.5 : 0.9;
-    const maxForce = kTren * this.mass * 1000 / 4 * tire.height ^ 2;
-    if (maxForce < steeringVector.getMagnitude()) {
-      steeringVector.setMagnitude(maxForce);
-      tire.isGliding = true;
-    } else {
-      tire.isGliding = false;
-    }
+    // const kTren = tire.isGliding ? 0.5 : 0.9;
+    // const maxForce = kTren * this.mass * 1000 / 4 * TIRE_HEIGHT ^ 2;
+    // if (maxForce < steeringVector.getMagnitude()) {
+    //   steeringVector.setMagnitude(maxForce);
+    //   tire.isGliding = true;
+    // } else {
+    //   tire.isGliding = false;
+    // }
 
     this.addForce({
-      point: tire.state.position,
+      point: tire,
       force: steeringVector
     });
 
@@ -94,11 +81,11 @@ export class Car extends RigidObject implements Drawable {
 
       // Apply throttle
       this.addForce({
-        point: this.backLeftTire.state.position,
+        point: this.backLeftTire,
         force: force
       });
       this.addForce({
-        point: this.backRightTire.state.position,
+        point: this.backRightTire,
         force: force
       });
     }
@@ -108,14 +95,14 @@ export class Car extends RigidObject implements Drawable {
     // this.state.angularVelocity = 3;
 
     // Apply steering
-    // this.addTireForce(this.frontLeftTire, secondsPassed);
-    // this.addTireForce(this.frontRightTire, secondsPassed);
-    // this.addTireForce(this.backLeftTire, secondsPassed);
-    // this.addTireForce(this.backRightTire, secondsPassed);
+    this.addTireForce(this.frontLeftTire, secondsPassed);
+    this.addTireForce(this.frontRightTire, secondsPassed);
+    this.addTireForce(this.backLeftTire, secondsPassed);
+    this.addTireForce(this.backRightTire, secondsPassed);
   }
 
-  public nextState(physics2d: Physics2d, delta: number): PhysicalState {
-    const res: PhysicalState = super.nextState(physics2d, delta);
+  public update(physics2d: Physics2d, delta: number) {
+    super.update(physics2d, delta);
 
     // let isOnRoad = false;
     // for (let r = 0; r < world.roads.length; r++) {
@@ -123,14 +110,11 @@ export class Car extends RigidObject implements Drawable {
     //     isOnRoad = true;
     //   }
     // }
-
-    return res;
   }
 
   private steer(angle: number) {
-    let newSteering = this.frontLeftTire.state.orientation + angle;
-    this.frontLeftTire.state.orientation = Math.sign(newSteering) * Math.min(Math.abs(newSteering), Math.PI / 4);
-    this.frontRightTire.state.orientation = this.frontLeftTire.state.orientation;
+    let newSteering = this.steering + angle;
+    this.steering = Math.sign(newSteering) * Math.min(Math.abs(newSteering), Math.PI / 4);
   }
 
   public applyController(controller: Controller) {
@@ -146,29 +130,27 @@ export class Car extends RigidObject implements Drawable {
       this.steer(-0.02);
     } else if (controller.right) {
       this.steer(0.02);
-    } else if (this.frontLeftTire.state.orientation !== 0) {
-      this.steer(-this.frontLeftTire.state.orientation / 10);
+    } else if (this.steering !== 0) {
+      this.steer(-this.steering / 10);
     }
   }
 
   // Drawable interface
-  drawTire(context: CanvasRenderingContext2D, tire: RigidObject) {
+  drawTire(context: CanvasRenderingContext2D, tire: Vector) {
     context.save();
     context.translate(
-      tire.state.position.x,
-      tire.state.position.y
+      tire.x,
+      tire.y
     );
-    context.rotate(tire.state.orientation);
-    context.fillRect(-tire.width / 2, -tire.height / 2, tire.width, tire.height);
+    context.rotate(this.steering);
+    context.fillRect(-TIRE_WIDTH / 2, -TIRE_HEIGHT / 2, TIRE_WIDTH, TIRE_HEIGHT);
     context.restore();
   }
 
-  render(context: CanvasRenderingContext2D) {
-    context.translate(this.state.position.x, this.state.position.y);
-    context.rotate(this.state.orientation); // in the screenshot I used angle = 20
-
+  draw(context: CanvasRenderingContext2D) {
     context.fillStyle = '#f00';
-    context.fillRect(-this.width / 2, -this.height / 2, this.width, this.height);
+    const shape = this.shape as RectShape;
+    context.fillRect(-shape.width / 2, -shape.height / 2, shape.width, shape.height);
 
     // Draw tires
     context.fillStyle = '#0f0';

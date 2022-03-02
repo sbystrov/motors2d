@@ -26,21 +26,27 @@ physics2d.addDynamicObject(new RigidObject(
   new RectShape(),
   1000,
   new Vector(25, 5),
-  new Vector(0, 5),
+  new Vector(0, 0),
+  // new Vector(0, 5),
+  Math.PI/4,
   0
 ));
 physics2d.addDynamicObject(new RigidObject(
   new RectShape(),
   10,
   new Vector(25, 30),
-  new Vector(0, -5),
+  new Vector(0, 0),
+  // new Vector(0, -5),
+  Math.PI/4,
   0
 ));
 physics2d.addDynamicObject(new RigidObject(
   new RectShape(),
   10,
-  new Vector(15, 0),
-  new Vector(5, 5),
+  new Vector(5, 0),
+  new Vector(0, 0),
+  // new Vector(5, 5),
+  Math.PI/4,
   0
 ));
 
@@ -48,21 +54,27 @@ physics2d.addDynamicObject(new RigidObject(
   new RectShape(),
   10,
   new Vector(25, 15),
-  new Vector(5, 5),
+  new Vector(0, 0),
+  // new Vector(5, 5),
+  Math.PI/4,
   0
 ));
 physics2d.addDynamicObject(new RigidObject(
   new RectShape(),
   10,
   new Vector(35, 7.5),
-  new Vector(-5, 5),
+  new Vector(0, 0),
+  // new Vector(-5, 5),
+  Math.PI/4,
   0
 ));
 physics2d.addDynamicObject(new RigidObject(
   new RectShape(),
   10,
   new Vector(30, 30),
-  new Vector(5, -5),
+  new Vector(0, 0),
+  // new Vector(5, -5),
+  Math.PI/4,
   0
 ));
 
@@ -102,7 +114,7 @@ export const Game: React.FC<Props> = (props: Props) => {
   }
 
   const loop = (timestamp: number) => {
-    // car.applyController(controllerRef.current);
+    car.applyController(controllerRef.current);
 
     // world.process(1/60);
     if (lastTimestampRef.current) {
@@ -110,7 +122,7 @@ export const Game: React.FC<Props> = (props: Props) => {
     }
     lastTimestampRef.current = timestamp;
 
-    // rendererRef.current.setViewport(car.state.position);
+    rendererRef.current.setViewport(car.position);
     rendererRef.current.render(world, physics2d);
 
     window.requestAnimationFrame(loop);

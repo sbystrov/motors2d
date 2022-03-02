@@ -3,6 +3,7 @@ import {Road} from "./world/roads/Road";
 import {Vector} from "./utils/Vector";
 import {Physics2d} from "./physics2d/Physics2d";
 import {RigidObject} from "./physics2d/RigidObject";
+import {Collision} from "./physics2d/Collision";
 
 const imagesToLoad = {
   'dirt': '/ground.jpeg',
@@ -62,7 +63,7 @@ export class Renderer {
     this.context.save();
 
     this.context.translate(this.context.canvas.width / 2, this.context.canvas.height / 2);
-    this.context.scale(5, 5);
+    this.context.scale(10, 10);
 
     this.context.translate(-this.viewport.x, -this.viewport.y);
 
@@ -98,22 +99,22 @@ export class Renderer {
     }
 
 
-    // Render car
-    const carImage = this.images['car'];
-
-    if (carImage) {
-      world.entities.forEach(e => {
-        this.context.save();
-
-        // // this.context.drawImage(carImage, -e.width / 2, -e.height / 2, e.width, e.height);
-        // this.context.fillStyle = '#f00';
-        // this.context.fillRect(-e.width / 2, -e.height / 2, e.width, e.height);
-        if ('render' in e) {
-          (e as unknown as Drawable).render(this.context);
-        }
-        this.context.restore();
-      })
-    }
+    // // Render car
+    // const carImage = this.images['car'];
+    //
+    // if (carImage) {
+    //   world.entities.forEach(e => {
+    //     this.context.save();
+    //
+    //     // // this.context.drawImage(carImage, -e.width / 2, -e.height / 2, e.width, e.height);
+    //     // this.context.fillStyle = '#f00';
+    //     // this.context.fillRect(-e.width / 2, -e.height / 2, e.width, e.height);
+    //     if ('render' in e) {
+    //       (e as unknown as Drawable).render(this.context);
+    //     }
+    //     this.context.restore();
+    //   })
+    // }
 
     // Рисуем физику
     const context = this.context;
@@ -121,8 +122,8 @@ export class Renderer {
       const object: RigidObject = physics.dynamicObjects[r];
 
       context.save();
-      context.translate(object.state.position.x, object.state.position.y);
-      context.rotate(object.state.orientation); // in the screenshot I used angle = 20
+      context.translate(object.position.x, object.position.y);
+      context.rotate(object.orientation);
 
       context.fillStyle = '#f00';
       if (physics.collisions.find(c => c.obj1 === object || c.obj2 === object)) {
@@ -131,7 +132,23 @@ export class Renderer {
       }
 
       context.strokeStyle = '#0ff';
-      object.shape.draw(context);
+      object.draw(context);
+
+      context.restore();
+    }
+
+    for (let r = 0; r < physics.collisions.length; r++) {
+      const collision: Collision = physics.collisions[r];
+
+      context.save();
+      context.translate(collision.position.x, collision.position.y);
+
+      context.beginPath();
+      context.fillStyle = '#0F0';
+      context.strokeStyle = '#0f0';
+      context.ellipse(0, 0, 0.3, 0.3, 0, 0, 2 * Math.PI);
+      context.fill();
+      context.stroke();
 
       context.restore();
     }
