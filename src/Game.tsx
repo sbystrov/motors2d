@@ -37,17 +37,18 @@ physics2d.addDynamicObject(new RigidObject(
   new Vector(25, 30),
   new Vector(0, 0),
   // new Vector(0, -5),
-  Math.PI/4,
+  0,
   0
 ));
+
 physics2d.addDynamicObject(new RigidObject(
   new RectShape(),
-  10,
+  300,
   new Vector(5, 0),
   new Vector(0, 0),
   // new Vector(5, 5),
   Math.PI/4,
-  0
+  1
 ));
 
 physics2d.addDynamicObject(new RigidObject(

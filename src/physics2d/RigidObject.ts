@@ -20,13 +20,13 @@ export class RigidObject {
   force: Vector = new Vector(0, 0);
   momentum: number = 0;
 
-  constructor(shape: Shape, mass: number, position: Vector, velocity: Vector, orientation: number, momentum: number) {
+  constructor(shape: Shape, mass: number, position: Vector, velocity: Vector, orientation: number, angularVelocity: number) {
     this.shape = shape;
     this.mass = mass;
     this.position = position;
     this.velocity = velocity;
     this.orientation = orientation;
-    this.momentum = momentum;
+    this.angularVelocity = angularVelocity;
   }
 
   public addForce(appliedForce: AppliedForce) {
@@ -59,6 +59,18 @@ export class RigidObject {
     // Now change speed and angular velocity
     this.velocity.addTo(this.force.rotate(this.orientation).multiply(secondsPassed / this.mass));
     this.angularVelocity += this.momentum * secondsPassed;
+  }
+
+  public getPointVelocity(point: Vector) {
+    const pointSpeed = this.velocity.copy();
+    const relativePosition = point.subtract(this.position);
+
+    // relativeSpeed.rotateBy(-this.orientation);
+    const rotationSpeed = relativePosition.rotate(Math.PI / 2).multiply(this.angularVelocity);
+    // relativeSpeed.addTo(rotationSpeed);
+    // relativeSpeed.multiplyBy(-1);
+
+    return pointSpeed.add(rotationSpeed);
   }
 
   public update(physics2d: Physics2d, secondsPassed: number) {

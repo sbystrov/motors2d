@@ -43,7 +43,10 @@ export class Physics2d {
 
           this.collisions.push(collision);
 
-          let vRelativeVelocity = {x: obj1.velocity.x - obj2.velocity.x, y: obj1.velocity.y - obj2.velocity.y};
+          const obj1collisionVelocity = obj1.getPointVelocity(collisionPosition);
+          const obj2collisionVelocity = obj2.getPointVelocity(collisionPosition);
+
+          let vRelativeVelocity = obj1collisionVelocity.subtract(obj2collisionVelocity);
           let speed = vRelativeVelocity.x * collisionVector.x + vRelativeVelocity.y * collisionVector.y;
           if (speed < 0) {
             continue;

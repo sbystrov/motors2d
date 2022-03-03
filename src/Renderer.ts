@@ -63,7 +63,7 @@ export class Renderer {
     this.context.save();
 
     this.context.translate(this.context.canvas.width / 2, this.context.canvas.height / 2);
-    this.context.scale(10, 10);
+    this.context.scale(30, 30);
 
     this.context.translate(-this.viewport.x, -this.viewport.y);
 
@@ -98,24 +98,6 @@ export class Renderer {
       }
     }
 
-
-    // // Render car
-    // const carImage = this.images['car'];
-    //
-    // if (carImage) {
-    //   world.entities.forEach(e => {
-    //     this.context.save();
-    //
-    //     // // this.context.drawImage(carImage, -e.width / 2, -e.height / 2, e.width, e.height);
-    //     // this.context.fillStyle = '#f00';
-    //     // this.context.fillRect(-e.width / 2, -e.height / 2, e.width, e.height);
-    //     if ('render' in e) {
-    //       (e as unknown as Drawable).render(this.context);
-    //     }
-    //     this.context.restore();
-    //   })
-    // }
-
     // Рисуем физику
     const context = this.context;
     for (let r = 0; r < physics.dynamicObjects.length; r++) {
@@ -144,9 +126,9 @@ export class Renderer {
       context.translate(collision.position.x, collision.position.y);
 
       context.beginPath();
-      context.fillStyle = '#0F0';
+      context.fillStyle = '#0f0';
       context.strokeStyle = '#0f0';
-      context.ellipse(0, 0, 0.3, 0.3, 0, 0, 2 * Math.PI);
+      context.ellipse(0, 0, 0.2, 0.2, 0, 0, 2 * Math.PI);
       context.fill();
       context.stroke();
 

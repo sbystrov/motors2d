@@ -35,7 +35,7 @@ export class Car extends RigidObject {
     this.backRightTire = new Vector(- shape.width / 2 + TIRE_WIDTH, shape.height / 2 - TIRE_HEIGHT / 2);
   }
 
-  private addTireForce(tire: Vector, secondsPassed: number) {
+  private addTireForce(tire: Vector, secondsPassed: number, direction?: number) {
     const steeringVector = new Vector(1, 0);
     const relativeSpeed = this.velocity.copy();
     relativeSpeed.rotateBy(-this.orientation);
@@ -44,7 +44,7 @@ export class Car extends RigidObject {
     relativeSpeed.multiplyBy(-1);
 
     // steeringVector.setDirection(tire.state.orientation + Math.PI * (Math.sign(tire.state.orientation) || 1) / 2);
-    steeringVector.setDirection(this.steering + Math.PI * (Math.sign(this.steering) || 1) / 2);
+    steeringVector.setDirection(direction + Math.PI * (Math.sign(direction) || 1) / 2);
 
     const projection = relativeSpeed.dotProduct(steeringVector);
     steeringVector.multiplyBy(projection);
@@ -82,11 +82,11 @@ export class Car extends RigidObject {
       // Apply throttle
       this.addForce({
         point: this.backLeftTire,
-        force: force
+        force: force.multiply(0.5)
       });
       this.addForce({
         point: this.backRightTire,
-        force: force
+        force: force.multiply(0.5)
       });
     }
 
@@ -95,10 +95,10 @@ export class Car extends RigidObject {
     // this.state.angularVelocity = 3;
 
     // Apply steering
-    this.addTireForce(this.frontLeftTire, secondsPassed);
-    this.addTireForce(this.frontRightTire, secondsPassed);
-    this.addTireForce(this.backLeftTire, secondsPassed);
-    this.addTireForce(this.backRightTire, secondsPassed);
+    this.addTireForce(this.frontLeftTire, secondsPassed, this.steering);
+    this.addTireForce(this.frontRightTire, secondsPassed, this.steering);
+    this.addTireForce(this.backLeftTire, secondsPassed, 0);
+    this.addTireForce(this.backRightTire, secondsPassed,0);
   }
 
   public update(physics2d: Physics2d, delta: number) {
@@ -136,13 +136,13 @@ export class Car extends RigidObject {
   }
 
   // Drawable interface
-  drawTire(context: CanvasRenderingContext2D, tire: Vector) {
+  drawTire(context: CanvasRenderingContext2D, tire: Vector, direction?: number) {
     context.save();
     context.translate(
       tire.x,
       tire.y
     );
-    context.rotate(this.steering);
+    context.rotate(direction || 0);
     context.fillRect(-TIRE_WIDTH / 2, -TIRE_HEIGHT / 2, TIRE_WIDTH, TIRE_HEIGHT);
     context.restore();
   }
@@ -157,8 +157,8 @@ export class Car extends RigidObject {
 
     context.save();
     context.fillStyle = '#0f0';
-    this.drawTire(context, this.frontLeftTire);
-    this.drawTire(context, this.frontRightTire);
+    this.drawTire(context, this.frontLeftTire, this.steering);
+    this.drawTire(context, this.frontRightTire, this.steering);
     context.fillStyle = '#00f';
     this.drawTire(context, this.backLeftTire);
     this.drawTire(context, this.backRightTire);
