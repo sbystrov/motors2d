@@ -1,6 +1,5 @@
 import {RigidObject} from "./RigidObject";
 import {Collision, detectCollision} from "./Collision";
-import {Vector} from "../utils/Vector";
 
 export class Physics2d {
   collisions: Collision[] = [];
@@ -12,14 +11,16 @@ export class Physics2d {
 
   public update = (secondsPassed: number) => {
     this.dynamicObjects.forEach(e => {
-      e.update(this, secondsPassed);
       e.enumerateForces(secondsPassed);
-      e.applyForces(secondsPassed);
     });
-    this.detectCollisions();
+    this.detectCollisions(secondsPassed);
+    this.dynamicObjects.forEach(e => {
+      e.applyForces(secondsPassed);
+      e.update(this, secondsPassed);
+    });
   }
 
-  private detectCollisions = () => {
+  private detectCollisions = (secondsPassed: number) => {
     this.collisions = [];
     // Start checking for collisions
     for (let i = 0; i < this.dynamicObjects.length; i++)
@@ -42,22 +43,36 @@ export class Physics2d {
           collision.direction = collisionVector;
 
           this.collisions.push(collision);
-
-          const obj1collisionVelocity = obj1.getPointVelocity(collisionPosition);
+          const obj1collisionVelocity = obj1.getPointVelocity(collisionPosition).multiply(1000);
           const obj2collisionVelocity = obj2.getPointVelocity(collisionPosition);
 
-          let vRelativeVelocity = obj1collisionVelocity.subtract(obj2collisionVelocity);
-          let speed = vRelativeVelocity.x * collisionVector.x + vRelativeVelocity.y * collisionVector.y;
-          if (speed < 0) {
-            continue;
-          }
 
+          //
+          let vRelativeVelocity = obj2collisionVelocity.subtract(obj1collisionVelocity);
+          let speed = vRelativeVelocity.x * collisionVector.x + vRelativeVelocity.y * collisionVector.y;
+          // if (speed < 0) {
+          //   continue;
+          // }
+          //
           let impulse = 2 * speed / (obj1.mass + obj2.mass);
 
-          collisionVector.setMagnitude(impulse * obj2.mass);
-          obj1.velocity.subtractFrom(collisionVector);
-          collisionVector.setMagnitude(impulse * obj1.mass);
-          obj2.velocity.addTo(collisionVector);
+
+          // collisionVector.setMagnitude(impulse * obj2.mass);
+          // obj1.velocity.subtractFrom(collisionVector);
+          // collisionVector.setMagnitude(impulse * obj1.mass);
+          // obj2.velocity.addTo(collisionVector);
+
+          vRelativeVelocity.normalize()
+          // obj1.addForce({
+          //   point: collisionPosition,
+          //   force: vRelativeVelocity.multiply(impulse * obj2.mass / secondsPassed ^ 2)
+          // })
+          // obj1.addForce({
+          //   point: collisionPosition,
+          //   force: vRelativeVelocity.multiply(-impulse * obj1.mass / secondsPassed ^ 2)
+          // })
+          // debugger;
+
         }
       }
     }

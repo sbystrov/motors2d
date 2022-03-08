@@ -67,20 +67,6 @@ export const detectCollision = (obj0: RigidObject, obj1: RigidObject): Vector =>
 
       return new Vector(resX / collisionPoints.length, resY / collisionPoints.length);
     }
-    // if (rectIntersect(
-    //   obj0.position.x - shape1.width / 2,
-    //   obj0.position.y - shape1.height / 2,
-    //   shape1.width,
-    //   shape1.height,
-    //   obj1.position.x - shape2.width / 2,
-    //   obj1.position.y - shape2.height / 2,
-    //   shape2.width,
-    //   shape2.height
-    // )) {
-    //   const vector = obj1.position.subtract(obj0.position);
-    //   vector.normalize();
-    //   return vector;
-    // }
   }
 
   return null;

@@ -132,9 +132,16 @@ export class Renderer {
       context.fill();
       context.stroke();
 
+
+      context.strokeStyle = '#000';
+      context.lineWidth = 0.1;
+      context.beginPath();
+      context.moveTo(0, 0);
+      context.lineTo(collision.direction.x, collision.direction.y);
+      context.stroke();
+
       context.restore();
     }
-
 
     this
       .context

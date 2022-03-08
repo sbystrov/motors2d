@@ -49,7 +49,7 @@ export class Car extends RigidObject {
     const projection = relativeSpeed.dotProduct(steeringVector);
     steeringVector.multiplyBy(projection);
 
-    steeringVector.multiplyBy(this.mass * tire.getMagnitude() ^ 2 / secondsPassed);
+    steeringVector.multiplyBy(this.mass * tire.getMagnitude() ^ 2 / (secondsPassed ^ 2));
 
     // const kTren = tire.isGliding ? 0.5 : 0.9;
     // const maxForce = kTren * this.mass * 1000 / 4 * TIRE_HEIGHT ^ 2;
@@ -131,7 +131,7 @@ export class Car extends RigidObject {
     } else if (controller.right) {
       this.steer(0.02);
     } else if (this.steering !== 0) {
-      this.steer(-this.steering / 10);
+      this.steering = Math.sign(this.steering) * (Math.abs(this.steering) - Math.min(0.02, Math.abs(this.steering)));
     }
   }
 
@@ -149,8 +149,7 @@ export class Car extends RigidObject {
 
   draw(context: CanvasRenderingContext2D) {
     context.fillStyle = '#f00';
-    const shape = this.shape as RectShape;
-    context.fillRect(-shape.width / 2, -shape.height / 2, shape.width, shape.height);
+    super.draw(context);
 
     // Draw tires
     context.fillStyle = '#0f0';

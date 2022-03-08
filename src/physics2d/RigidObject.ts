@@ -80,5 +80,18 @@ export class RigidObject {
 
   public draw(context:CanvasRenderingContext2D) {
     this.shape.draw(context);
+
+    // Draw forces
+    this.appliedForces.forEach(f => {
+      const force = new Vector(f.force.x, f.force.y);
+      force.multiplyBy(1/this.mass);
+
+      context.strokeStyle = '#000';
+      context.lineWidth = 0.1;
+      context.beginPath();
+      context.moveTo(f.point.x, f.point.y);
+      context.lineTo(f.point.x + force.x, f.point.y + force.y);
+      context.stroke();
+    })
   }
 }
