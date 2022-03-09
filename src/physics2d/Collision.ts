@@ -6,7 +6,7 @@ export class Collision {
   obj1: RigidObject;
   obj2: RigidObject;
   position: Vector;
-  direction: Vector;
+  normal: Vector;
 }
 
 // const rectIntersect = (x1, y1, w1, h1, x2, y2, w2, h2) => {
@@ -39,7 +39,7 @@ const lineLine = (x1: number, y1: number, x2: number, y2: number, x3: number, y3
   return null;
 }
 
-export const detectCollision = (obj0: RigidObject, obj1: RigidObject): Vector => {
+export const detectCollision = (obj0: RigidObject, obj1: RigidObject): Collision => {
   if (obj0.shape instanceof RectShape && obj1.shape instanceof RectShape) {
     const poly0 = obj0.shape.getPoly(obj0.position, obj0.orientation);
     const poly1 = obj1.shape.getPoly(obj1.position, obj1.orientation);
@@ -57,15 +57,26 @@ export const detectCollision = (obj0: RigidObject, obj1: RigidObject): Vector =>
       }
     }
 
-    if (collisionPoints.length > 0) {
+    if (collisionPoints.length === 2) {
       let resX = 0;
       let resY = 0;
+
       collisionPoints.forEach(p => {
         resX += p.x;
         resY += p.y;
       });
 
-      return new Vector(resX / collisionPoints.length, resY / collisionPoints.length);
+      const normal = collisionPoints[0].subtract(collisionPoints[1]);
+      normal.rotateBy(Math.PI / 2);
+      normal.normalize();
+
+      const collision = new Collision();
+      collision.obj1 = obj0;
+      collision.obj2 = obj1;
+      collision.position = new Vector(resX / collisionPoints.length, resY / collisionPoints.length);
+      collision.normal = normal;
+
+      return collision;
     }
   }
 

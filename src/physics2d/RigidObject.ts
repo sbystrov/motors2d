@@ -29,6 +29,10 @@ export class RigidObject {
     this.angularVelocity = angularVelocity;
   }
 
+  public momentOfInertia() {
+    return this.shape.momentOfInertia(this.mass);
+  }
+
   public addForce(appliedForce: AppliedForce) {
     this.appliedForces.push(appliedForce);
   }

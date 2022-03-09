@@ -3,6 +3,7 @@ import {Vector} from "../../utils/Vector";
 export abstract class Shape {
   public abstract draw(context: CanvasRenderingContext2D): void;
   public abstract getPoly(position: Vector, orientation: number): Polygon;
+  public abstract momentOfInertia(mass: number): number;
 }
 
 export class Line {

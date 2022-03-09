@@ -12,6 +12,10 @@ export class RectShape extends Shape {
     this.height = height || 5;
   }
 
+  public momentOfInertia(mass: number) {
+    return mass * (this.width * this.height) / 6;
+  };
+
   public draw(context:CanvasRenderingContext2D) {
     context.fillRect(-this.width / 2, -this.height / 2, this.width, this.height);
   }

@@ -137,7 +137,12 @@ export class Renderer {
       context.lineWidth = 0.1;
       context.beginPath();
       context.moveTo(0, 0);
-      context.lineTo(collision.direction.x, collision.direction.y);
+      // const obj1collisionVelocity = collision.obj1.getPointVelocity(collision.position);
+      // const obj2collisionVelocity = collision.obj2.getPointVelocity(collision.position);
+      // let vRelativeVelocity = obj2collisionVelocity.subtract(obj1collisionVelocity);
+      //
+      // context.lineTo(vRelativeVelocity.x, vRelativeVelocity.y);
+      context.lineTo(collision.normal.x, collision.normal.y);
       context.stroke();
 
       context.restore();
