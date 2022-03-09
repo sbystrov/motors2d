@@ -39,7 +39,7 @@ export class Physics2d {
           this.collisions.push(collision);
           // http://www.cs.uu.nl/docs/vakken/mgp/2016-2017/Lecture%203%20-%20Collisions.pdf
 
-          const coefficientOfRestitution = 0.5;
+          const coefficientOfRestitution = 0.8;
 
           const A = new Vec3(collision.obj1.position.x, collision.obj1.position.y, 0);
           const B = new Vec3(collision.obj2.position.x, collision.obj2.position.y, 0);
@@ -64,6 +64,10 @@ export class Physics2d {
           let j = -(1 + coefficientOfRestitution) * vA.minus(vB).dot(n);
           j = j / ((1 / obj1.mass + 1 / obj2.mass) + angularImpulsePart);
 
+          if (j < 0) {
+            // Objects are going apart - ignore interaction
+            continue;
+          }
 
           obj1.velocity.addTo(collision.normal.multiply(j / collision.obj1.mass));
           obj2.velocity.addTo(collision.normal.multiply(-j / collision.obj2.mass));

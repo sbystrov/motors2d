@@ -66,14 +66,18 @@ export const detectCollision = (obj0: RigidObject, obj1: RigidObject): Collision
         resY += p.y;
       });
 
+      const position = new Vector(resX / collisionPoints.length, resY / collisionPoints.length);
+      const rA = obj0.position.subtract(position);
+
       const normal = collisionPoints[0].subtract(collisionPoints[1]);
       normal.rotateBy(Math.PI / 2);
+      normal.multiplyBy(Math.sign(rA.dotProduct(normal)));
       normal.normalize();
 
       const collision = new Collision();
       collision.obj1 = obj0;
       collision.obj2 = obj1;
-      collision.position = new Vector(resX / collisionPoints.length, resY / collisionPoints.length);
+      collision.position = position;
       collision.normal = normal;
 
       return collision;
