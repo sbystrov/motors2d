@@ -19,65 +19,64 @@ const world = new World();
 const car = new Car();
 const physics2d = new Physics2d();
 
-// world.entities.push(car);
 physics2d.addDynamicObject(car);
-
+//
+// physics2d.addDynamicObject(new RigidObject(
+//   new RectShape(),
+//   1000,
+//   new Vector(25, 5),
+//   new Vector(0, 0),
+//   // new Vector(0, 5),
+//   Math.PI/4,
+//   0
+// ));
+// physics2d.addDynamicObject(new RigidObject(
+//   new RectShape(),
+//   10,
+//   new Vector(25, 30),
+//   new Vector(0, 0),
+//   // new Vector(0, -5),
+//   0,
+//   0
+// ));
+//
 physics2d.addDynamicObject(new RigidObject(
   new RectShape(),
-  1000,
-  new Vector(25, 5),
-  new Vector(0, 0),
-  // new Vector(0, 5),
-  Math.PI/4,
-  0
-));
-physics2d.addDynamicObject(new RigidObject(
-  new RectShape(),
-  10,
-  new Vector(25, 30),
-  new Vector(0, 0),
-  // new Vector(0, -5),
   0,
-  0
-));
-
-physics2d.addDynamicObject(new RigidObject(
-  new RectShape(),
-  1000,
   new Vector(5, 0),
   new Vector(0, 0),
   // new Vector(5, 5),
   0,
   1
 ));
-
+//
+// physics2d.addDynamicObject(new RigidObject(
+//   new RectShape(),
+//   10,
+//   new Vector(25, 15),
+//   new Vector(0, 0),
+//   // new Vector(5, 5),
+//   Math.PI/4,
+//   0
+// ));
 physics2d.addDynamicObject(new RigidObject(
   new RectShape(),
-  10,
-  new Vector(25, 15),
-  new Vector(0, 0),
-  // new Vector(5, 5),
-  Math.PI/4,
-  0
-));
-physics2d.addDynamicObject(new RigidObject(
-  new RectShape(),
-  10,
+  0,
   new Vector(35, 7.5),
   new Vector(0, 0),
   // new Vector(-5, 5),
   Math.PI/4,
-  0
+  1
 ));
-physics2d.addDynamicObject(new RigidObject(
-  new RectShape(),
-  10,
-  new Vector(30, 30),
-  new Vector(0, 0),
-  // new Vector(5, -5),
-  Math.PI/4,
-  0
-));
+// physics2d.addDynamicObject(new RigidObject(
+//   new RectShape(),
+//   10,
+//   new Vector(30, 30),
+//   new Vector(0, 0),
+//   // new Vector(5, -5),
+//   Math.PI/4,
+//   0
+// ));
 
 export const Game: React.FC<Props> = (props: Props) => {
   const {

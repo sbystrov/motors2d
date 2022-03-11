@@ -51,29 +51,33 @@ export class Physics2d {
           const rB = p.minus(B);
           const wArA = wA.cross(rA);
           const wBrB = wB.cross(rB);
+          const dividedMass1 = collision.obj1.mass === 0 ? 0 : 1 / collision.obj1.mass;
+          const dividedMass2 = collision.obj2.mass === 0 ? 0 : 1 / collision.obj2.mass;
+          const dividedMoment1 = collision.obj1.mass === 0 ? 0 : 1 / collision.obj1.momentOfInertia();
+          const dividedMoment2 = collision.obj2.mass === 0 ? 0 : 1 / collision.obj2.momentOfInertia();
 
           let vA = new Vec3(collision.obj1.velocity.x, collision.obj1.velocity.y, 0);
           vA = vA.plus(wArA);
           let vB = new Vec3(collision.obj2.velocity.x, collision.obj2.velocity.y, 0);
           vB = vB.plus(wBrB);
 
-          let angularImpulsePartV = rA.cross(n).scaled(1/collision.obj1.momentOfInertia()).cross(rA);
-          angularImpulsePartV = angularImpulsePartV.plus(rB.cross(n).scaled(1/collision.obj2.momentOfInertia()).cross(rB));
+          let angularImpulsePartV = rA.cross(n).scaled(dividedMoment1).cross(rA);
+          angularImpulsePartV = angularImpulsePartV.plus(rB.cross(n).scaled(dividedMoment2).cross(rB));
           const angularImpulsePart = angularImpulsePartV.dot(n);
 
           let j = -(1 + coefficientOfRestitution) * vA.minus(vB).dot(n);
-          j = j / ((1 / obj1.mass + 1 / obj2.mass) + angularImpulsePart);
+          j = j / ((dividedMass1 + dividedMass2) + angularImpulsePart);
 
           if (j < 0) {
             // Objects are going apart - ignore interaction
             continue;
           }
 
-          obj1.velocity.addTo(collision.normal.multiply(j / collision.obj1.mass));
-          obj2.velocity.addTo(collision.normal.multiply(-j / collision.obj2.mass));
+          obj1.velocity.addTo(collision.normal.multiply(j * dividedMass1));
+          obj2.velocity.addTo(collision.normal.multiply(-j * dividedMass2));
 
-          const wAnext = wA.add(rA.cross(n.scaled(j)).scaled(1/collision.obj2.momentOfInertia()));
-          const wBnext = wB.add(rB.cross(n.scaled(j)).scaled(-1/collision.obj2.momentOfInertia()));
+          const wAnext = wA.add(rA.cross(n.scaled(j)).scaled(dividedMoment1));
+          const wBnext = wB.add(rB.cross(n.scaled(j)).scaled(-dividedMoment2));
           obj1.angularVelocity = wAnext.z;
           obj2.angularVelocity = wBnext.z;
         }

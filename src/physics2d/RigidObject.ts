@@ -61,8 +61,10 @@ export class RigidObject {
     }
 
     // Now change speed and angular velocity
-    this.velocity.addTo(this.force.rotate(this.orientation).multiply(secondsPassed / this.mass));
-    this.angularVelocity += this.momentum * secondsPassed;
+    if (this.mass) {
+      this.velocity.addTo(this.force.rotate(this.orientation).multiply(secondsPassed / this.mass));
+      this.angularVelocity += this.momentum * secondsPassed;
+    }
   }
 
   public getPointVelocity(point: Vector) {
