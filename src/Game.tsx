@@ -20,14 +20,55 @@ const car = new Car();
 const physics2d = new Physics2d();
 
 physics2d.addDynamicObject(car);
+
+world.roads.forEach(r => {
+  for (let i = 0; i < r.fence0.length - 1; i++) {
+    const p0 = r.fence0[i];
+    const p1 = r.fence0[i+1];
+    const p = p1.subtract(p0);
+
+    physics2d.addDynamicObject(new RigidObject(
+      new RectShape(p.getMagnitude(), 0.5),
+      0,
+      new Vector((p0.x + p1.x) / 2, (p0.y + p1.y) / 2),
+      new Vector(0, 0),
+      p.getDirection(),
+      0
+    ));
+  }
+
+  for (let i = 0; i < r.fence1.length - 1; i++) {
+    const p0 = r.fence1[i];
+    const p1 = r.fence1[i+1];
+    const p = p1.subtract(p0);
+
+    physics2d.addDynamicObject(new RigidObject(
+      new RectShape(p.getMagnitude(), 0.5),
+      0,
+      new Vector((p0.x + p1.x) / 2, (p0.y + p1.y) / 2),
+      new Vector(0, 0),
+      p.getDirection(),
+      0
+    ));
+  }
+})
 //
 // physics2d.addDynamicObject(new RigidObject(
-//   new RectShape(),
-//   1000,
-//   new Vector(25, 5),
+//   new RectShape(100, 0.5),
+//   0,
+//   new Vector(50, -10),
 //   new Vector(0, 0),
 //   // new Vector(0, 5),
-//   Math.PI/4,
+//   0,
+//   0
+// ));
+// physics2d.addDynamicObject(new RigidObject(
+//   new RectShape(100, 0.5),
+//   0,
+//   new Vector(50, 10),
+//   new Vector(0, 0),
+//   // new Vector(0, 5),
+//   0,
 //   0
 // ));
 // physics2d.addDynamicObject(new RigidObject(
@@ -42,7 +83,7 @@ physics2d.addDynamicObject(car);
 //
 physics2d.addDynamicObject(new RigidObject(
   new RectShape(),
-  0,
+  100,
   new Vector(5, 0),
   new Vector(0, 0),
   // new Vector(5, 5),
@@ -61,7 +102,7 @@ physics2d.addDynamicObject(new RigidObject(
 // ));
 physics2d.addDynamicObject(new RigidObject(
   new RectShape(),
-  0,
+  100,
   new Vector(35, 7.5),
   new Vector(0, 0),
   // new Vector(-5, 5),

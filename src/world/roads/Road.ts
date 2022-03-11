@@ -3,6 +3,8 @@ import {Vector} from "../../utils/Vector";
 
 export class Road {
   tiles: Triangle[] = [];
+  fence0: Vector[] = [];
+  fence1: Vector[] = [];
 
   public addTile(tile: Triangle) {
     this.tiles.push(tile);

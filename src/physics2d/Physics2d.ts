@@ -32,6 +32,9 @@ export class Physics2d {
       for (let j = i + 1; j < this.dynamicObjects.length; j++)
       {
         const obj2 = this.dynamicObjects[j];
+        if (obj1.mass === 0 && obj2.mass === 0) {
+          continue;
+        }
 
         // Compare object1 with object2
         const collision = detectCollision(obj1, obj2);
@@ -39,7 +42,7 @@ export class Physics2d {
           this.collisions.push(collision);
           // http://www.cs.uu.nl/docs/vakken/mgp/2016-2017/Lecture%203%20-%20Collisions.pdf
 
-          const coefficientOfRestitution = 0.8;
+          const coefficientOfRestitution = 0.3;
 
           const A = new Vec3(collision.obj1.position.x, collision.obj1.position.y, 0);
           const B = new Vec3(collision.obj2.position.x, collision.obj2.position.y, 0);

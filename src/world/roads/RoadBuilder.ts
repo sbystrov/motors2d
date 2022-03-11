@@ -32,6 +32,9 @@ export class RoadBuilder {
     this.road.addTile(new Triangle(this.pLeft, this.pRight, pLeftNext));
     this.road.addTile(new Triangle(this.pRight, pLeftNext, pRightNext));
 
+    this.road.fence0.push(this.pLeft);
+    this.road.fence1.push(this.pRight);
+
     // Move position
     this.position = positionNext;
     this.pLeft = pLeftNext;
@@ -56,6 +59,8 @@ export class RoadBuilder {
 
       this.road.addTile(new Triangle(this.pLeft, this.pRight, pLeftNext));
       this.road.addTile(new Triangle(this.pRight, pLeftNext, pRightNext));
+      this.road.fence0.push(this.pLeft);
+      this.road.fence1.push(this.pRight);
 
       // Move position
       this.direction = directionNext;
