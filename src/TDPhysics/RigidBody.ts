@@ -16,7 +16,7 @@ export class RigidBody {
   mass = 1;
   invertedMass = 1 / this.mass;
 
-  elasticity = 0.9;
+  elasticity = 0.6;
 
   invertedInertia: number;
 
@@ -107,8 +107,7 @@ export class RigidBody {
 
   public getInvertedInertia() {
     if (!this.invertedInertia) {
-      const inertia = this.shape.momentOfInertia(this.mass);
-      this.invertedInertia = 1 / inertia;
+      this.invertedInertia = this.mass === 0 ? 0 : 1 / this.shape.momentOfInertia(this.mass);
     }
     return this.invertedInertia;
   }

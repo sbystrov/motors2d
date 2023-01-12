@@ -56,4 +56,45 @@ export class Vector{
   static cross(v1, v2){
     return v1.x*v2.y - v1.y*v2.x;
   }
+
+
+  /**
+   * Rotates vector by angle
+   *
+   * @angle {number} direction The rotation angle (in radians) to assign to the vector
+   * @memberof Vector
+   */
+  rotateBy(angle: number) {
+    const cos = Math.cos(angle);
+    const sin = Math.sin(angle);
+    const {x, y} = this;
+    this.x = cos * x - sin * y;
+    this.y = sin * x + cos * y;
+  }
+
+
+  /**
+   * Rotates vector by angle
+   *
+   * @angle {number} direction The rotation angle (in radians) to assign to the vector
+   * @memberof Vector
+   */
+  rotate(angle: number) {
+    const res = new Vector(this.x, this.y);
+    res.rotateBy(angle);
+    return res;
+  }
+
+
+  /**
+   * Gets the direction of the current vector in radians
+   *
+   * The direction is the angle in polar coordinates
+   *
+   * @returns {number} The direction (or angle) of the vector
+   * @memberof Vector
+   */
+  getDirection(): number {
+    return Math.atan2(this.y, this.x);
+  }
 }

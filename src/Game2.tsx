@@ -40,6 +40,13 @@ export const Game2: React.FC<Props> = (props: Props) => {
     // const c1 = Bodies.circle(0, 0, 10);
     // c1.velocity = new Vector(0, 400);
     // physicsRef.current.world.add([c1]);
+    // const R = 10;
+    // for (let i=0; i<6; i++) {
+    //   for (let j=0; j<=i; j++) {
+    //     const c = Bodies.circle(j * R * 2 - i * Math.cos(Math.PI / 6) * R, 200 + 2 * i * Math.cos(Math.PI / 6) * R, R - 0.5);
+    //     physicsRef.current.world.add([c]);
+    //   }
+    // }
 
     // // Test bench 4 (circle + rect)
     // const c1 = Bodies.circle(80, -80, 100);
@@ -47,12 +54,49 @@ export const Game2: React.FC<Props> = (props: Props) => {
     // const wall = Bodies.rectangle(0, 300, 1000, 50);
     // physicsRef.current.world.add([c1, wall]);
 
-    // Test bench 5 (circle + rect)
-    const c1 = Bodies.circle(80, -80, 100);
-    c1.velocity = new Vector(0, 100);
-    const wall = Bodies.rectangle(0, 300, 1000, 50);
-    wall.setMass(0);
-    physicsRef.current.world.add([c1, wall]);
+    // // Test bench 5 (rect + static wall)
+    // const c1 = Bodies.rectangle(80, -80, 100, 100);
+    // const c2 = Bodies.rectangle(0, 0, 1250, 30);
+    // // c2.orientation = Math.PI / 30;
+    // c2.angularVelocity = 1;
+    // c2.setMass(0);
+    // const wall0 = Bodies.rectangle(0, 500, 1000, 50);
+    // wall0.setMass(0);
+    // const wall1 = Bodies.rectangle(0, -500, 1000, 50);
+    // wall1.setMass(0);
+    // const wall2 = Bodies.rectangle(500, 0, 50, 1000);
+    // wall2.setMass(0);
+    // const wall3 = Bodies.rectangle(-500, 0, 50, 1000);
+    // wall3.setMass(0);
+    // physicsRef.current.world.add([c1, c2, wall0, wall1, wall2, wall3]);
+    //
+    // const R = 10;
+    // for (let i=0; i<10; i++) {
+    //   for (let j=0; j<=i; j++) {
+    //     const c = Bodies.circle(j * R * 2 - i * Math.cos(Math.PI / 6) * R, 200 + 2 * i * Math.cos(Math.PI / 6) * R, R - 0.5);
+    //     physicsRef.current.world.add([c]);
+    //   }
+    // }
+
+    // Test bench 6 (many rects)
+    const wall0 = Bodies.rectangle(0, 500, 1000, 50);
+    wall0.setMass(0);
+    const wall1 = Bodies.rectangle(0, -500, 1000, 50);
+    wall1.setMass(0);
+    const wall2 = Bodies.rectangle(500, 0, 50, 1000);
+    wall2.setMass(0);
+    const wall3 = Bodies.rectangle(-500, 0, 50, 1000);
+    wall3.setMass(0);
+    physicsRef.current.world.add([wall0, wall1, wall2, wall3]);
+
+    const R = 30;
+    const N = 5;
+    for (let i=0; i < N; i++) {
+      for (let j=0; j < N; j++) {
+        const c = Bodies.rectangle(i * R, 500 - 25 - (j + 0.5) * R, R, R);
+        physicsRef.current.world.add([c]);
+      }
+    }
 
     const canvas = document.querySelector('#canvas') as HTMLCanvasElement;
     rendererRef.current = new Renderer(canvas, physicsRef.current);
