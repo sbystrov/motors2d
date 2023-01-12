@@ -39,6 +39,10 @@ export class RigidObject {
 
   public enumerateForces(secondsPassed: number) {
     this.appliedForces = [];
+    this.addForce({
+      point: new Vector(0, 0),
+      force: new Vector(0, 9.8 * this.mass).rotate(-this.orientation)
+    })
   }
 
   public applyForces(secondsPassed: number) {
@@ -57,7 +61,9 @@ export class RigidObject {
 
       // const momentumForce = perpendicular.multiply(perpendicular.dotProduct(appliedForce.force) / appliedForce.force.dotProduct(appliedForce.force));
       momentumForce.rotateBy(-appliedForce.point.getDirection());
-      this.momentum += Math.sign(momentumForce.y) * momentumForce.getMagnitude() / (this.mass * (appliedForce.point.getMagnitude() ^ 2));
+      if (appliedForce.point.getMagnitude() > 0) {
+        this.momentum += Math.sign(momentumForce.y) * momentumForce.getMagnitude() / (this.mass * (appliedForce.point.getMagnitude() ^ 2));
+      }
     }
 
     // Now change speed and angular velocity
@@ -87,17 +93,17 @@ export class RigidObject {
   public draw(context:CanvasRenderingContext2D) {
     this.shape.draw(context);
 
-    // Draw forces
-    this.appliedForces.forEach(f => {
-      const force = new Vector(f.force.x, f.force.y);
-      force.multiplyBy(1/this.mass);
-
-      context.strokeStyle = '#000';
-      context.lineWidth = 0.1;
-      context.beginPath();
-      context.moveTo(f.point.x, f.point.y);
-      context.lineTo(f.point.x + force.x, f.point.y + force.y);
-      context.stroke();
-    })
+    // // Draw forces
+    // this.appliedForces.forEach(f => {
+    //   const force = new Vector(f.force.x, f.force.y);
+    //   force.multiplyBy(1/this.mass);
+    //
+    //   context.strokeStyle = '#000';
+    //   context.lineWidth = 0.1;
+    //   context.beginPath();
+    //   context.moveTo(f.point.x, f.point.y);
+    //   context.lineTo(f.point.x + force.x, f.point.y + force.y);
+    //   context.stroke();
+    // })
   }
 }

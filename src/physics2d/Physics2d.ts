@@ -14,11 +14,11 @@ export class Physics2d {
 
   public update = (secondsPassed: number) => {
     this.dynamicObjects.forEach(e => {
+      e.applyForces(secondsPassed);
       e.enumerateForces(secondsPassed);
     });
     this.detectCollisions(secondsPassed);
     this.dynamicObjects.forEach(e => {
-      e.applyForces(secondsPassed);
       e.update(this, secondsPassed);
     });
   }

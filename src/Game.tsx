@@ -19,39 +19,39 @@ const world = new World();
 const car = new Car();
 const physics2d = new Physics2d();
 
-physics2d.addDynamicObject(car);
+// physics2d.addDynamicObject(car);
 
-world.roads.forEach(r => {
-  for (let i = 0; i < r.fence0.length - 1; i++) {
-    const p0 = r.fence0[i];
-    const p1 = r.fence0[i+1];
-    const p = p1.subtract(p0);
-
-    physics2d.addDynamicObject(new RigidObject(
-      new RectShape(p.getMagnitude(), 0.5),
-      0,
-      new Vector((p0.x + p1.x) / 2, (p0.y + p1.y) / 2),
-      new Vector(0, 0),
-      p.getDirection(),
-      0
-    ));
-  }
-
-  for (let i = 0; i < r.fence1.length - 1; i++) {
-    const p0 = r.fence1[i];
-    const p1 = r.fence1[i+1];
-    const p = p1.subtract(p0);
-
-    physics2d.addDynamicObject(new RigidObject(
-      new RectShape(p.getMagnitude(), 0.5),
-      0,
-      new Vector((p0.x + p1.x) / 2, (p0.y + p1.y) / 2),
-      new Vector(0, 0),
-      p.getDirection(),
-      0
-    ));
-  }
-})
+// world.roads.forEach(r => {
+//   for (let i = 0; i < r.fence0.length - 1; i++) {
+//     const p0 = r.fence0[i];
+//     const p1 = r.fence0[i+1];
+//     const p = p1.subtract(p0);
+//
+//     physics2d.addDynamicObject(new RigidObject(
+//       new RectShape(p.getMagnitude(), 0.5),
+//       0,
+//       new Vector((p0.x + p1.x) / 2, (p0.y + p1.y) / 2),
+//       new Vector(0, 0),
+//       p.getDirection(),
+//       0
+//     ));
+//   }
+//
+//   for (let i = 0; i < r.fence1.length - 1; i++) {
+//     const p0 = r.fence1[i];
+//     const p1 = r.fence1[i+1];
+//     const p = p1.subtract(p0);
+//
+//     physics2d.addDynamicObject(new RigidObject(
+//       new RectShape(p.getMagnitude(), 0.5),
+//       0,
+//       new Vector((p0.x + p1.x) / 2, (p0.y + p1.y) / 2),
+//       new Vector(0, 0),
+//       p.getDirection(),
+//       0
+//     ));
+//   }
+// })
 //
 // physics2d.addDynamicObject(new RigidObject(
 //   new RectShape(100, 0.5),
@@ -81,15 +81,15 @@ world.roads.forEach(r => {
 //   0
 // ));
 //
-physics2d.addDynamicObject(new RigidObject(
-  new RectShape(),
-  100,
-  new Vector(5, 0),
-  new Vector(0, 0),
-  // new Vector(5, 5),
-  0,
-  1
-));
+// physics2d.addDynamicObject(new RigidObject(
+//   new RectShape(),
+//   100,
+//   new Vector(5, 0),
+//   new Vector(0, 0),
+//   // new Vector(5, 5),
+//   0,
+//   1
+// ));
 //
 // physics2d.addDynamicObject(new RigidObject(
 //   new RectShape(),
@@ -100,15 +100,15 @@ physics2d.addDynamicObject(new RigidObject(
 //   Math.PI/4,
 //   0
 // ));
-physics2d.addDynamicObject(new RigidObject(
-  new RectShape(),
-  100,
-  new Vector(35, 7.5),
-  new Vector(0, 0),
-  // new Vector(-5, 5),
-  Math.PI/4,
-  1
-));
+// physics2d.addDynamicObject(new RigidObject(
+//   new RectShape(),
+//   100,
+//   new Vector(35, 7.5),
+//   new Vector(0, 0),
+//   // new Vector(-5, 5),
+//   Math.PI/4,
+//   1
+// ));
 // physics2d.addDynamicObject(new RigidObject(
 //   new RectShape(),
 //   10,
@@ -118,6 +118,70 @@ physics2d.addDynamicObject(new RigidObject(
 //   Math.PI/4,
 //   0
 // ));
+
+const BOX_SIZE = 20;
+const BOX_WIDTH = 1;
+physics2d.addDynamicObject(new RigidObject(
+  new RectShape(BOX_SIZE, BOX_WIDTH),
+  0,
+  new Vector(0,-BOX_SIZE / 2),
+  new Vector(0, 0),
+  0,
+  0
+));
+physics2d.addDynamicObject(new RigidObject(
+  new RectShape(BOX_SIZE, BOX_WIDTH),
+  0,
+  new Vector(0, BOX_SIZE / 2),
+  new Vector(0, 0),
+  0,
+  0
+));
+
+physics2d.addDynamicObject(new RigidObject(
+  new RectShape(BOX_WIDTH, BOX_SIZE),
+  0,
+  new Vector(-BOX_SIZE / 2, 0),
+  new Vector(0, 0),
+  0,
+  0
+));
+
+physics2d.addDynamicObject(new RigidObject(
+  new RectShape(BOX_WIDTH, BOX_SIZE),
+  0,
+  new Vector(BOX_SIZE / 2, 0),
+  new Vector(0, 0),
+  0,
+  0
+));
+
+physics2d.addDynamicObject(new RigidObject(
+  new RectShape(4, 4),
+  10,
+  new Vector( 0, 0),
+  new Vector(0, 0),
+  // new Vector(5, 5),
+  Math.PI / 4+ 0.001,
+  0
+));
+//
+// const SIZE = 1;
+// const AMOUNT = 5;
+//
+// for (let j=0; j < AMOUNT; j++) {
+//   for (let i = 0; i < AMOUNT; i++) {
+//     physics2d.addDynamicObject(new RigidObject(
+//       new RectShape(SIZE, SIZE),
+//       100,
+//       new Vector( - AMOUNT * SIZE / 2 + (j * (SIZE + 0.000001)), i * SIZE - AMOUNT / 2),
+//       new Vector(0, 0),
+//       // new Vector(5, 5),
+//       0,
+//       0
+//     ));
+//   }
+// }
 
 export const Game: React.FC<Props> = (props: Props) => {
   const {
@@ -167,6 +231,7 @@ export const Game: React.FC<Props> = (props: Props) => {
     rendererRef.current.render(world, physics2d);
 
     window.requestAnimationFrame(loop);
+    // setInterval(() => loop(10), 10);
   }
 
   useEffect(() => {

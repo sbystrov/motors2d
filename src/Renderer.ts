@@ -67,18 +67,18 @@ export class Renderer {
 
     this.context.translate(-this.viewport.x, -this.viewport.y);
 
-    // Render ground
-    const tile_width = 128;
-    const tile_height = 128;
-    for (let x = 0; x < world.size; x++) {
-      for (let y = 0; y < world.size; y++) {
-
-        const img = this.images[world.ground[x + y * world.size]];
-        if (img) {
-          this.context.drawImage(img, x * tile_width, y * tile_height, tile_width, tile_height);
-        }
-      }
-    }
+    // // Render ground
+    // const tile_width = 128;
+    // const tile_height = 128;
+    // for (let x = 0; x < world.size; x++) {
+    //   for (let y = 0; y < world.size; y++) {
+    //
+    //     const img = this.images[world.ground[x + y * world.size]];
+    //     if (img) {
+    //       this.context.drawImage(img, x * tile_width, y * tile_height, tile_width, tile_height);
+    //     }
+    //   }
+    // }
 
     // Render roads
     const ctx = this.context;
@@ -89,12 +89,12 @@ export class Renderer {
 
       for (let t = 0; t < road.tiles.length; t++) {
         const tile = road.tiles[t];
-        ctx.beginPath();
-        ctx.moveTo(tile.p0.x, tile.p0.y);
-        ctx.lineTo(tile.p1.x, tile.p1.y);
-        ctx.lineTo(tile.p2.x, tile.p2.y);
-        ctx.closePath();
-        ctx.fill();
+        // ctx.beginPath();
+        // ctx.moveTo(tile.p0.x, tile.p0.y);
+        // ctx.lineTo(tile.p1.x, tile.p1.y);
+        // ctx.lineTo(tile.p2.x, tile.p2.y);
+        // ctx.closePath();
+        // ctx.fill();
       }
     }
 
@@ -108,48 +108,47 @@ export class Renderer {
       context.rotate(object.orientation);
 
       context.fillStyle = '#f00';
-      if (physics.collisions.find(c => c.obj1 === object || c.obj2 === object)) {
-        // Подкрасим столкнувшиеся элементы
-        context.fillStyle = '#0ff';
-      }
+      // if (physics.collisions.find(c => c.obj1 === object || c.obj2 === object)) {
+      //   // Подкрасим столкнувшиеся элементы
+      //   context.fillStyle = '#0ff';
+      // }
 
-      context.strokeStyle = '#0ff';
+      context.strokeStyle = '#fff';
+      context.lineWidth = 0.1;
       object.draw(context);
 
       context.restore();
     }
 
-    for (let r = 0; r < physics.collisions.length; r++) {
-      const collision: Collision = physics.collisions[r];
+    // for (let r = 0; r < physics.collisions.length; r++) {
+    //   const collision: Collision = physics.collisions[r];
+    //
+    //   context.save();
+    //   context.translate(collision.position.x, collision.position.y);
+    //
+    //   context.beginPath();
+    //   context.fillStyle = '#0f0';
+    //   context.strokeStyle = '#0f0';
+    //   context.ellipse(0, 0, 0.2, 0.2, 0, 0, 2 * Math.PI);
+    //   context.fill();
+    //   context.stroke();
+    //
+    //
+    //   context.strokeStyle = '#000';
+    //   context.lineWidth = 0.1;
+    //   context.beginPath();
+    //   context.moveTo(0, 0);
+    //   // const obj1collisionVelocity = collision.obj1.getPointVelocity(collision.position);
+    //   // const obj2collisionVelocity = collision.obj2.getPointVelocity(collision.position);
+    //   // let vRelativeVelocity = obj2collisionVelocity.subtract(obj1collisionVelocity);
+    //   //
+    //   // context.lineTo(vRelativeVelocity.x, vRelativeVelocity.y);
+    //   context.lineTo(collision.normal.x, collision.normal.y);
+    //   context.stroke();
+    //
+    //   context.restore();
+    // }
 
-      context.save();
-      context.translate(collision.position.x, collision.position.y);
-
-      context.beginPath();
-      context.fillStyle = '#0f0';
-      context.strokeStyle = '#0f0';
-      context.ellipse(0, 0, 0.2, 0.2, 0, 0, 2 * Math.PI);
-      context.fill();
-      context.stroke();
-
-
-      context.strokeStyle = '#000';
-      context.lineWidth = 0.1;
-      context.beginPath();
-      context.moveTo(0, 0);
-      // const obj1collisionVelocity = collision.obj1.getPointVelocity(collision.position);
-      // const obj2collisionVelocity = collision.obj2.getPointVelocity(collision.position);
-      // let vRelativeVelocity = obj2collisionVelocity.subtract(obj1collisionVelocity);
-      //
-      // context.lineTo(vRelativeVelocity.x, vRelativeVelocity.y);
-      context.lineTo(collision.normal.x, collision.normal.y);
-      context.stroke();
-
-      context.restore();
-    }
-
-    this
-      .context
-      .restore();
+    this.context.restore();
   }
 }

@@ -1,5 +1,5 @@
 import {Line, Polygon, Shape} from "./Shape";
-import {Vector} from "../../utils/Vector";
+import {Vector} from '../Vector';
 
 export class RectShape extends Shape {
   width: number = 5;
@@ -57,4 +57,8 @@ export class RectShape extends Shape {
 
     return res;
   };
+
+  public getVertices(pos: Vector, axis: Vector): Vector[] {
+    throw new Error("Method not implemented.");
+  }
 }
