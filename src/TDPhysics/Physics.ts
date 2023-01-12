@@ -1,5 +1,4 @@
 import {World} from './World';
-import {RigidBody} from './RigidBody';
 import {Collider} from './collider/Collider';
 import {Vector} from './Vector';
 
@@ -13,17 +12,18 @@ export class Physics {
     //   e.applyForces(secondsPassed);
     //   e.enumerateForces(secondsPassed);
     // });
-    this.detectCollisions(secondsPassed);
+    this.detectCollisions();
     this.resolvePenetrations();
     this.resolveCollisions();
-    this.world.bodies.forEach(e => {
-      this.updatePositionAndOrientation(e, secondsPassed);
-    });
+
+    this.updatePositionAndOrientation(secondsPassed);
   }
 
-  private updatePositionAndOrientation(body: RigidBody, secondsPassed: number) {
-    body.position = body.position.add(body.velocity.mult(secondsPassed));
-    body.orientation = body.orientation + body.angularVelocity * secondsPassed;
+  private updatePositionAndOrientation(secondsPassed: number) {
+    this.world.bodies.forEach(body => {
+      body.position = body.position.add(body.velocity.mult(secondsPassed));
+      body.orientation = body.orientation + body.angularVelocity * secondsPassed;
+    });
   }
 
   //
@@ -92,7 +92,7 @@ export class Physics {
   //   }
   // }
 
-  private detectCollisions = (secondsPassed: number) => {
+  private detectCollisions = () => {
     this.world.collidedBodies = [];
     // Start checking for collisions
     for (let i = 0; i < this.world.bodies.length; i++) {
@@ -105,8 +105,16 @@ export class Physics {
 
         // Compare object1 with object2
         const collision = Collider.detectCollision(
-          { pos: obj0.position, shape: obj0.shape },
-          { pos: obj1.position, shape: obj1.shape }
+          {
+            position: obj0.position,
+            shape: obj0.shape,
+            directionVector: new Vector(Math.cos(obj0.orientation), Math.sin(obj0.orientation))
+          },
+          {
+            position: obj1.position,
+            shape: obj1.shape,
+            directionVector: new Vector(Math.cos(obj1.orientation), Math.sin(obj1.orientation))
+          }
         );
         if (collision){
           this.world.collidedBodies.push({

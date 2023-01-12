@@ -1,7 +1,7 @@
 import {Line, Polygon, Shape} from "./Shape";
 import {Vector} from '../Vector';
 
-export class RectShape extends Shape {
+export class Rectangle extends Shape {
   width: number = 5;
   height: number = 5;
 
@@ -58,7 +58,16 @@ export class RectShape extends Shape {
     return res;
   };
 
-  public getVertices(pos: Vector, axis: Vector): Vector[] {
-    throw new Error("Method not implemented.");
-  }
+  public getVertices(pos: Vector, directionVector: Vector, axis: Vector): Vector[] {
+    const normal = directionVector.normal();
+    const halfWidth = directionVector.mult(this.width / 2);
+    const halfHeight = normal.mult(this.height / 2);
+
+    return [
+      pos.add(halfWidth).add(halfHeight),
+      pos.add(halfWidth).add(halfHeight.mult(-1)),
+      pos.add(halfWidth.mult(-1)).add(halfHeight),
+      pos.add(halfWidth.mult(-1)).add(halfHeight.mult(-1)),
+    ];
+  };
 }

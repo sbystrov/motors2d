@@ -27,7 +27,7 @@ export const Game2: React.FC<Props> = (props: Props) => {
     // const wall = Bodies.rectangle(0, 200, 1000, 10);
     // physicsRef.current.world.add([r1, wall]);
 
-    // // Test becnh 2
+    // // Test bench 2
     // const c1 = Bodies.circle(20, 0, 100);
     // c1.velocity = new Vector(0, 100);
     // const c2 = Bodies.circle(0, 200, 10);
@@ -36,19 +36,23 @@ export const Game2: React.FC<Props> = (props: Props) => {
     // c3.setMass(10);
     // physicsRef.current.world.add([c1, c2, c3]);
 
-    // Test becnh 3 (billiard)
-    const c1 = Bodies.circle(0, 0, 10);
-    c1.velocity = new Vector(0, 400);
-    physicsRef.current.world.add([c1]);
+    // // Test bench 3 (billiard)
+    // const c1 = Bodies.circle(0, 0, 10);
+    // c1.velocity = new Vector(0, 400);
+    // physicsRef.current.world.add([c1]);
 
-    const R = 10;
-    for (let i=0; i<5; i++) {
-      for (let j=0; j<=i; j++) {
-        const c = Bodies.circle(j * R * 2 - i * Math.cos(Math.PI / 6) * R, 300 + 2 * i * Math.cos(Math.PI / 6) * R, R - 0.5);
-        physicsRef.current.world.add([c]);
+    // // Test bench 4 (circle + rect)
+    // const c1 = Bodies.circle(80, -80, 100);
+    // c1.velocity = new Vector(0, 100);
+    // const wall = Bodies.rectangle(0, 300, 1000, 50);
+    // physicsRef.current.world.add([c1, wall]);
 
-      }
-    }
+    // Test bench 5 (circle + rect)
+    const c1 = Bodies.circle(80, -80, 100);
+    c1.velocity = new Vector(0, 100);
+    const wall = Bodies.rectangle(0, 300, 1000, 50);
+    wall.setMass(0);
+    physicsRef.current.world.add([c1, wall]);
 
     const canvas = document.querySelector('#canvas') as HTMLCanvasElement;
     rendererRef.current = new Renderer(canvas, physicsRef.current);

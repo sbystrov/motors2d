@@ -77,7 +77,7 @@ export class Renderer {
         this.context.lineWidth = 1;
         this.context.beginPath();
         this.context.moveTo(0, 0);
-        const v = collision.normal.mult(-collision.penetrationDepth);
+        const v = collision.normal.mult(collision.penetrationDepth);
         this.context.lineTo(v.x, v.y);
         this.context.stroke();
         this.context.closePath();

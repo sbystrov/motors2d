@@ -1,13 +1,13 @@
 import {Vector} from '../Vector';
 
 export abstract class Shape {
-  pos: Vector;
+  position: Vector;
 
   public abstract draw(context: CanvasRenderingContext2D): void;
   public abstract getPoly(position: Vector, orientation: number): Polygon;
   public abstract momentOfInertia(mass: number): number;
 
-  public abstract getVertices(pos: Vector, axis: Vector): Vector[];
+  public abstract getVertices(pos: Vector, directionVector: Vector, axis: Vector): Vector[];
 }
 
 export class Line {

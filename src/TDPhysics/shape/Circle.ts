@@ -56,7 +56,7 @@ export class Circle extends Shape {
     return res;
   };
 
-  public getVertices(pos: Vector, axis: Vector): Vector[] {
+  public getVertices(pos: Vector, directionVector: Vector, axis: Vector): Vector[] {
     return [
       pos.add(axis.unit().mult(-this.radius)),
       pos.add(axis.unit().mult(this.radius))
