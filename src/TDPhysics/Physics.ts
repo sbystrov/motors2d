@@ -106,6 +106,12 @@ export class Physics {
       let vsep_diff = new_sepVel - sepVel;
 
       let impulse = vsep_diff / (obj0.getInvertedMass() + obj1.getInvertedMass() + impAug1 + impAug2);
+
+      // Objects are going apart - ignore interaction
+      if (impulse < 0) {
+        return;
+      }
+
       let impulseVec = collision.normal.mult(impulse);
 
       //3. Changing the velocities

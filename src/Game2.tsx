@@ -89,11 +89,14 @@ export const Game2: React.FC<Props> = (props: Props) => {
     wall3.setMass(0);
     physicsRef.current.world.add([wall0, wall1, wall2, wall3]);
 
+    // const c1 = Bodies.rectangle(80, -80, 100, 100);
+    // physicsRef.current.world.add([c1]);
+
     const R = 30;
     const N = 5;
     for (let i=0; i < N; i++) {
       for (let j=0; j < N; j++) {
-        const c = Bodies.rectangle(i * R, 500 - 25 - (j + 0.5) * R, R, R);
+        const c = Bodies.rectangle(i * R - N * R / 2, 500 - 25 - (j + 0.5) * R, R, R);
         physicsRef.current.world.add([c]);
       }
     }
