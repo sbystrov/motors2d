@@ -3,6 +3,12 @@ import {Collider} from './collider/Collider';
 import {Vector} from './Vector';
 import {RigidBody} from './RigidBody';
 
+// Based on these tutorials:
+// 1. http://www.cs.uu.nl/docs/vakken/mgp/2016-2017/Lecture%203%20-%20Collisions.pdf
+// 2. https://github.com/danielszabo88/mocorgo
+// 3. https://www.youtube.com/watch?v=TUZvvmu4Yz4
+// 4. https://habr.com/ru/post/341540/ (friction)
+
 export class Physics {
   world: World = new World();
   lastTimestamp: number = 0;
@@ -74,10 +80,18 @@ export class Physics {
         obj0, obj1, collision
       } = item;
       // Penetration resolution
-      let penResolution = collision.normal.mult(collision.penetrationDepth / (obj0.getInvertedMass() + obj1.getInvertedMass()));
+
+      const percent = 0.8 // usually 20% to 80%
+      const kSlop = 0.01 // usually 0.01 to 0.1
+
+      let penResolution = collision.normal.mult(percent * Math.max(collision.penetrationDepth - kSlop, 0 ) / (obj0.getInvertedMass() + obj1.getInvertedMass()));
       obj0.position = obj0.position.add(penResolution.mult(obj0.getInvertedMass()));
       obj1.position = obj1.position.add(penResolution.mult(-obj1.getInvertedMass()));
     })
+  }
+
+  static pythagoreanSolve(a: number, b: number): number {
+    return Math.sqrt(a**2 + b**2);
   }
 
   private resolveCollisions() {
@@ -106,15 +120,31 @@ export class Physics {
       let vsep_diff = new_sepVel - sepVel;
 
       let impulse = vsep_diff / (obj0.getInvertedMass() + obj1.getInvertedMass() + impAug1 + impAug2);
-
       // Objects are going apart - ignore interaction
       if (impulse < 0) {
-        return;
+        impulse = 0;
       }
 
       let impulseVec = collision.normal.mult(impulse);
+      //3. Friction
+      const tangent = relVel.subtr(collision.normal.mult(Vector.dot( relVel, collision.normal ))).unit();
 
-      //3. Changing the velocities
+      // Вычисляем величину, прилагаемую вдоль вектора трения
+      const jt = -Vector.dot(relVel, tangent) / (obj0.getInvertedMass() + obj1.getInvertedMass());
+
+      // PythagoreanSolve = A^2 + B^2 = C^2, вычисляем C для заданных A и B
+      // Используем для аппроксимации мю для заданных коэффициентов трения каждого тела
+      const mu = Physics.pythagoreanSolve( obj0.staticFriction, obj1.staticFriction );
+
+      // Ограничиваем величину трения и создаём вектор импульса силы
+      if(Math.abs( jt ) < impulse * mu) {
+        impulseVec = impulseVec.add(tangent.mult(jt));
+      } else {
+        const dynamicFriction = Physics.pythagoreanSolve( obj0.dynamicFriction, obj1.dynamicFriction );
+        impulseVec = impulseVec.add(tangent.mult(-impulse * dynamicFriction));
+      }
+
+      //4. Changing the velocities
       obj0.velocity = obj0.velocity.add(impulseVec.mult(obj0.getInvertedMass()));
       obj1.velocity = obj1.velocity.add(impulseVec.mult(-obj1.getInvertedMass()));
 

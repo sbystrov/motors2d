@@ -78,7 +78,30 @@ export const Game2: React.FC<Props> = (props: Props) => {
     //   }
     // }
 
-    // Test bench 6 (many rects)
+    // // Test bench 6 (many rects)
+    // const wall0 = Bodies.rectangle(0, 500, 1000, 50);
+    // wall0.setMass(0);
+    // const wall1 = Bodies.rectangle(0, -500, 1000, 50);
+    // wall1.setMass(0);
+    // const wall2 = Bodies.rectangle(500, 0, 50, 1000);
+    // wall2.setMass(0);
+    // const wall3 = Bodies.rectangle(-500, 0, 50, 1000);
+    // wall3.setMass(0);
+    // physicsRef.current.world.add([wall0, wall1, wall2, wall3]);
+    //
+    // // const c1 = Bodies.rectangle(80, -80, 100, 100);
+    // // physicsRef.current.world.add([c1]);
+    //
+    // const R = 30;
+    // const N = 5;
+    // for (let i=0; i < N; i++) {
+    //   for (let j=0; j < N; j++) {
+    //     const c = Bodies.rectangle(i * R - N * R / 2, 500 - 25 - (j + 0.5) * R, R, R);
+    //     physicsRef.current.world.add([c]);
+    //   }
+    // }
+
+    // Test bench 7 (slope)
     const wall0 = Bodies.rectangle(0, 500, 1000, 50);
     wall0.setMass(0);
     const wall1 = Bodies.rectangle(0, -500, 1000, 50);
@@ -89,17 +112,12 @@ export const Game2: React.FC<Props> = (props: Props) => {
     wall3.setMass(0);
     physicsRef.current.world.add([wall0, wall1, wall2, wall3]);
 
-    // const c1 = Bodies.rectangle(80, -80, 100, 100);
-    // physicsRef.current.world.add([c1]);
-
-    const R = 30;
-    const N = 5;
-    for (let i=0; i < N; i++) {
-      for (let j=0; j < N; j++) {
-        const c = Bodies.rectangle(i * R - N * R / 2, 500 - 25 - (j + 0.5) * R, R, R);
-        physicsRef.current.world.add([c]);
-      }
-    }
+    const c1 = Bodies.rectangle(80, -40, 100, 100);
+    // c1.velocity = new Vector(100, 0);
+    const c2 = Bodies.rectangle(0, 0, 800, 10);
+    c2.orientation = Math.PI / 8;
+    c2.setMass(0);
+    physicsRef.current.world.add([c1, c2]);
 
     const canvas = document.querySelector('#canvas') as HTMLCanvasElement;
     rendererRef.current = new Renderer(canvas, physicsRef.current);
