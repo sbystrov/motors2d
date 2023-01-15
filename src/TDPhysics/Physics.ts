@@ -8,6 +8,7 @@ import {RigidBody} from './RigidBody';
 // 2. https://github.com/danielszabo88/mocorgo
 // 3. https://www.youtube.com/watch?v=TUZvvmu4Yz4
 // 4. https://habr.com/ru/post/341540/ (friction)
+// 5. https://gamedevelopment.tutsplus.com/series/how-to-create-a-custom-physics-engine--gamedev-12715
 
 export class Physics {
   world: World = new World();
@@ -81,8 +82,8 @@ export class Physics {
       } = item;
       // Penetration resolution
 
-      const percent = 0.8 // usually 20% to 80%
-      const kSlop = 0.01 // usually 0.01 to 0.1
+      const percent = 0.4 // usually 20% to 80%
+      const kSlop = 0.05 // usually 0.01 to 0.1
 
       let penResolution = collision.normal.mult(percent * Math.max(collision.penetrationDepth - kSlop, 0 ) / (obj0.getInvertedMass() + obj1.getInvertedMass()));
       obj0.position = obj0.position.add(penResolution.mult(obj0.getInvertedMass()));
@@ -99,57 +100,71 @@ export class Physics {
       const {
         obj0, obj1, collision
       } = item;
-      // Collision resolution
-      //1. Closing velocity
-      let collArm1 = collision.vertex.subtr(obj0.position);
-      let rotVel1 = new Vector(-obj0.angularVelocity * collArm1.y, obj0.angularVelocity * collArm1.x);
-      let closVel1 = obj0.velocity.add(rotVel1);
-      let collArm2 = collision.vertex.subtr(obj1.position);
-      let rotVel2= new Vector(-obj1.angularVelocity * collArm2.y, obj1.angularVelocity * collArm2.x);
-      let closVel2 = obj1.velocity.add(rotVel2);
+      // Calculate radii from COM to contact
+      const ra = collision.vertex.subtr(obj0.position);
+      const rb = collision.vertex.subtr(obj1.position);
 
-      //2. Impulse augmentation
-      let impAug1 = Vector.cross(collArm1, collision.normal);
-      impAug1 = impAug1 * obj0.getInvertedInertia() * impAug1;
-      let impAug2 = Vector.cross(collArm2, collision.normal);
-      impAug2 = impAug2 * obj1.getInvertedInertia() * impAug2;
+      // Relative velocity
+      const rv = obj1.velocity
+        .add(new Vector(-obj1.angularVelocity * rb.y, obj1.angularVelocity * rb.x))
+        .subtr(obj0.velocity)
+        .subtr(new Vector(-obj0.angularVelocity * ra.y, obj0.angularVelocity * ra.x));
 
-      let relVel = closVel1.subtr(closVel2);
-      let sepVel = Vector.dot(relVel, collision.normal);
-      let new_sepVel = -sepVel * Math.min(obj0.elasticity, obj1.elasticity);
-      let vsep_diff = new_sepVel - sepVel;
+      // Relative velocity along the normal
+      const contactVel = Vector.dot(rv, collision.normal);
 
-      let impulse = vsep_diff / (obj0.getInvertedMass() + obj1.getInvertedMass() + impAug1 + impAug2);
-      // Objects are going apart - ignore interaction
-      if (impulse < 0) {
-        impulse = 0;
+      // Do not resolve if velocities are separating
+      if(contactVel < 0)
+        return;
+
+      const raCrossN = Vector.cross( ra, collision.normal );
+      const rbCrossN = Vector.cross( rb, collision.normal );
+      const invMassSum = obj0.getInvertedMass() + obj1.getInvertedMass() + raCrossN**2 * obj0.getInvertedInertia() + rbCrossN**2 * obj1.getInvertedInertia();
+
+      // Calculate impulse scalar
+      let j = -(1.0 + Math.min( obj0.elasticity, obj1.elasticity )) * contactVel;
+      j /= invMassSum;
+      // j /= contact_count;
+
+      // Apply impulse
+      const impulse = collision.normal.mult(j);
+
+      obj0.velocity = obj0.velocity.add(impulse.mult(-obj0.getInvertedMass()));
+      obj1.velocity = obj1.velocity.add(impulse.mult(obj1.getInvertedMass()));
+
+      obj0.angularVelocity -= obj0.getInvertedInertia() * Vector.cross(ra, impulse);
+      obj1.angularVelocity += obj1.getInvertedInertia() * Vector.cross(rb, impulse);
+
+      // Friction impulse
+      const t = rv.subtr(collision.normal.mult(Vector.dot( rv, collision.normal ))).unit();
+
+      // j tangent magnitude
+      let jt = -Vector.dot( rv, t );
+      jt /= invMassSum;
+      // jt /= (real)contact_count;
+
+      // Don't apply tiny friction impulses
+      if(jt === 0) {
+        return;
       }
 
-      let impulseVec = collision.normal.mult(impulse);
-      //3. Friction
-      const tangent = relVel.subtr(collision.normal.mult(Vector.dot( relVel, collision.normal ))).unit();
+      const sf = Math.sqrt( obj0.staticFriction * obj1.staticFriction );
+      const df = Math.sqrt( obj0.dynamicFriction * obj1.dynamicFriction );
+      // Coulumb's law
+      let tangentImpulse;
+      if(Math.abs( jt ) < j * sf)
+        tangentImpulse = t.mult(jt);
+      else
+        tangentImpulse = t.mult(jt * df);
 
-      // Вычисляем величину, прилагаемую вдоль вектора трения
-      const jt = -Vector.dot(relVel, tangent) / (obj0.getInvertedMass() + obj1.getInvertedMass());
+      // debugger;
 
-      // PythagoreanSolve = A^2 + B^2 = C^2, вычисляем C для заданных A и B
-      // Используем для аппроксимации мю для заданных коэффициентов трения каждого тела
-      const mu = Physics.pythagoreanSolve( obj0.staticFriction, obj1.staticFriction );
+      // Apply friction impulse
+      obj0.velocity = obj0.velocity.add(tangentImpulse.mult(-obj0.getInvertedMass()));
+      obj1.velocity = obj1.velocity.add(tangentImpulse.mult(obj1.getInvertedMass()));
 
-      // Ограничиваем величину трения и создаём вектор импульса силы
-      if(Math.abs( jt ) < impulse * mu) {
-        impulseVec = impulseVec.add(tangent.mult(jt));
-      } else {
-        const dynamicFriction = Physics.pythagoreanSolve( obj0.dynamicFriction, obj1.dynamicFriction );
-        impulseVec = impulseVec.add(tangent.mult(-impulse * dynamicFriction));
-      }
-
-      //4. Changing the velocities
-      obj0.velocity = obj0.velocity.add(impulseVec.mult(obj0.getInvertedMass()));
-      obj1.velocity = obj1.velocity.add(impulseVec.mult(-obj1.getInvertedMass()));
-
-      obj0.angularVelocity += obj0.getInvertedInertia() * Vector.cross(collArm1, impulseVec);
-      obj1.angularVelocity -= obj1.getInvertedInertia() * Vector.cross(collArm2, impulseVec);
+      obj0.angularVelocity -= obj0.getInvertedInertia() * Vector.cross(ra, tangentImpulse);
+      obj1.angularVelocity += obj1.getInvertedInertia() * Vector.cross(rb, tangentImpulse);
     })
   }
 
@@ -182,7 +197,8 @@ export class Physics {
 
   static step(physics: Physics, timestamp: number) {
     if (timestamp > 0) {
-      physics.update((timestamp - physics.lastTimestamp) / 1000.0);
+      const dt = Math.min((timestamp - physics.lastTimestamp) / 1000.0, 0.01);
+      physics.update(dt);
     }
     physics.lastTimestamp = timestamp;
 

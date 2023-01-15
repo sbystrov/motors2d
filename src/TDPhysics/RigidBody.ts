@@ -16,9 +16,9 @@ export class RigidBody {
   mass = 1;
   invertedMass = 1 / this.mass;
 
-  elasticity = 0.6;
-  staticFriction = 0.6;
-  dynamicFriction = 0.5;
+  elasticity = 0.3;
+  staticFriction = 0.3;
+  dynamicFriction = 0.2;
 
   invertedInertia: number;
 
