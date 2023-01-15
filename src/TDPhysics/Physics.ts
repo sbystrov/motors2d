@@ -152,12 +152,11 @@ export class Physics {
       const df = Math.sqrt( obj0.dynamicFriction * obj1.dynamicFriction );
       // Coulumb's law
       let tangentImpulse;
-      if(Math.abs( jt ) < j * sf)
+      if(Math.abs( jt ) < j * sf) {
         tangentImpulse = t.mult(jt);
-      else
-        tangentImpulse = t.mult(jt * df);
-
-      // debugger;
+      } else {
+        tangentImpulse = t.mult(j * df);
+      }
 
       // Apply friction impulse
       obj0.velocity = obj0.velocity.add(tangentImpulse.mult(-obj0.getInvertedMass()));

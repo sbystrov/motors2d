@@ -5,7 +5,6 @@ import classNames from "classnames";
 import {Renderer} from './TDPhysics/Renderer';
 import {Physics} from './TDPhysics/Physics';
 import {Bodies} from './TDPhysics/Bodies';
-import {Vector} from './TDPhysics/Vector';
 
 type Props = {
   className?: string;
